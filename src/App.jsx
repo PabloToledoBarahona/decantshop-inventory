@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import PerfumeList from './components/PerfumeList';
-import AddPerfume from './components/AddPerfume';
+import AddPerfumeForm from './components/AddPerfumeForm';
+import DecantList from './components/DecantList';
+import AddDecantForm from './components/AddDecantForm';
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('list'); // Estado inicial
+  const [currentPage, setCurrentPage] = useState('list');
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Navbar recibe setCurrentPage como prop */}
+    <div>
       <Navbar setCurrentPage={setCurrentPage} />
-
-      <div className="container mx-auto p-4">
-        {currentPage === 'list' && <PerfumeList/>}
-        {currentPage === 'add' && <AddPerfume/>}
+      <div className="p-6">
+        {currentPage === 'list' && <PerfumeList />}
+        {currentPage === 'add' && <AddPerfumeForm />}
+        {currentPage === 'decants' && <DecantList />}
+        {currentPage === 'addDecant' && <AddDecantForm onAdd={() => setCurrentPage('decants')} />}
       </div>
     </div>
   );

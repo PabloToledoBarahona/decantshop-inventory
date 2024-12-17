@@ -2,27 +2,55 @@ import React from 'react';
 
 const Navbar = ({ setCurrentPage }) => {
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-10">
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+    <nav className="bg-gray-900 p-4 shadow-lg">
+      <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <h1 className="text-3xl font-extrabold text-gray-900 hover:opacity-80">
-          Decant<span className="text-blue-500">Shop</span>
-        </h1>
+        <div className="text-white text-3xl font-bold tracking-wide hover:text-gray-300 transition-all duration-300 cursor-pointer">
+          DecantShop
+        </div>
 
         {/* Navegación */}
-        <div className="flex space-x-6">
-          <button
-            onClick={() => setCurrentPage('list')}
-            className="text-gray-600 hover:text-blue-500 hover:underline transition"
-          >
-            Lista de Perfumes
-          </button>
-          <button
-            onClick={() => setCurrentPage('add')}
-            className="text-gray-600 hover:text-blue-500 hover:underline transition"
-          >
-            Agregar Perfume
-          </button>
+        <ul className="flex space-x-6 text-white">
+          <li>
+            <button
+              onClick={() => setCurrentPage('list')}
+              className="hover:text-blue-400 transition-all duration-300"
+            >
+              📝 Lista de Perfumes
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => setCurrentPage('add')}
+              className="hover:text-blue-400 transition-all duration-300"
+            >
+              ➕ Agregar Perfume
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => setCurrentPage('decants')}
+              className="hover:text-blue-400 transition-all duration-300"
+            >
+              📦 Lista de Decants
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => setCurrentPage('addDecant')}
+              className="hover:text-blue-400 transition-all duration-300"
+            >
+              ✏️ Agregar Decant
+            </button>
+          </li>
+        </ul>
+
+        {/* Botón de perfil (placeholder) */}
+        <div className="flex items-center space-x-2">
+          <span className="text-white hidden sm:block">Pablo Toledo</span>
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center shadow-md cursor-pointer">
+            <span className="text-white font-bold">P</span>
+          </div>
         </div>
       </div>
     </nav>
