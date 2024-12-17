@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
+import Navbar from './components/Navbar';
 import PerfumeList from './components/PerfumeList';
 import AddPerfume from './components/AddPerfume';
-import Navbar from './components/Navbar';
 
 const App = () => {
-  const [currentPage, setCurrentPage] = useState('list');
-
-  const renderPage = () => {
-    if (currentPage === 'list') return <PerfumeList />;
-    if (currentPage === 'add') return <AddPerfume />;
-    return null;
-  };
+  const [currentPage, setCurrentPage] = useState('list'); // Estado inicial
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-100">
+      {/* Navbar recibe setCurrentPage como prop */}
       <Navbar setCurrentPage={setCurrentPage} />
-      <div className="container mx-auto p-4">{renderPage()}</div>
+
+      <div className="container mx-auto p-4">
+        {currentPage === 'list' && <PerfumeList/>}
+        {currentPage === 'add' && <AddPerfume/>}
+      </div>
     </div>
   );
 };
