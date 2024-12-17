@@ -1,69 +1,72 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const PerfumeList = () => {
   const [perfumes, setPerfumes] = useState([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchPerfumes = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/api/perfumes");
-        setPerfumes(response.data);
-      } catch (err) {
-        console.error("Error al obtener perfumes:", err);
-        setError("Error al obtener perfumes");
-      }
-    };
-
     fetchPerfumes();
   }, []);
 
+  const fetchPerfumes = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/perfumes');
+      setPerfumes(response.data);
+    } catch (error) {
+      console.error('Error al obtener perfumes:', error);
+      setError('No se pudo obtener la lista de perfumes.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/perfumes/${id}`);
+      // Actualizar la lista eliminando el perfume borrado
+      setPerfumes(perfumes.filter((perfume) => perfume.id !== id));
+    } catch (error) {
+      console.error('Error al eliminar perfume:', error);
+      setError('No se pudo eliminar el perfume.');
+    }
+  };
+
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-        Inventario de Perfumes
-      </h1>
-      {error ? (
-        <p className="text-red-500 text-center">{error}</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {perfumes.length > 0 ? (
-            perfumes.map((perfume) => (
-              <div
-                key={perfume.id}
-                className="border rounded-lg shadow-md p-4 bg-white hover:shadow-lg transition-shadow duration-300"
-              >
-                <h2 className="text-xl font-semibold text-gray-700">
-                  {perfume.name}
-                </h2>
-                <p className="text-gray-600 mt-2">
-                  <strong>Total ML:</strong> {perfume.total_ml} ml
-                </p>
-                <p className="text-gray-600">
-                  <strong>ML Restantes:</strong> {perfume.remaining_ml} ml
-                </p>
-                <p className="mt-2 font-medium text-gray-800">
-                  Estado:{" "}
-                  <span
-                    className={`${
-                      perfume.status === "Disponible"
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {perfume.status}
-                  </span>
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="text-center col-span-full">
-              No hay perfumes disponibles.
-            </p>
-          )}
-        </div>
-      )}
+    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
+      <h2 className="text-2xl font-bold mb-4 text-center">Listado de Perfumes</h2>
+      {error && <p className="text-red-500 text-center">{error}</p>}
+
+      <ul>
+        {perfumes.map((perfume) => (
+          <li
+            key={perfume.id}
+            className="flex justify-between items-center p-4 border-b"
+          >
+            <div>
+              <p className="font-semibold">{perfume.name}</p>
+              <p>ML Totales: {perfume.total_ml}</p>
+              <p>ML Restantes: {perfume.remaining_ml}</p>
+              <p>
+                Estado:{' '}
+                <span
+                  className={
+                    perfume.status === 'Disponible'
+                      ? 'text-green-500'
+                      : 'text-red-500'
+                  }
+                >
+                  {perfume.status}
+                </span>
+              </p>
+            </div>
+            <button
+              onClick={() => handleDelete(perfume.id)}
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+            >
+              Eliminar
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
