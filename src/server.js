@@ -1,10 +1,12 @@
-const express = require('express');
+const express = require('express')
+const cors = require('cors');;
 const db = require('./models'); // Importar modelos y la conexión Sequelize
 const perfumeRoutes = require('./routes/perfumeRoutes'); // Importar las rutas
 const decantRoutes = require('./routes/decantRoutes'); // Importar las rutas de decants
 const transferRoutes = require('./routes/transferRoutes'); // Importar rutas de transferencias
 
 const app = express();
+app.use(cors());
 const PORT = 3000;
 
 app.use(express.json());

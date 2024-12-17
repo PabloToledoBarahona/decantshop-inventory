@@ -1,13 +1,12 @@
 import React from "react";
 import Navbar from "./components/Navbar";
+import PerfumeList from "./components/PerfumeList";
 
 const App = () => {
   return (
     <div>
       <Navbar />
-      <h2 className="text-center mt-10 text-3xl font-semibold">
-        Bienvenido a DecantShop
-      </h2>
+      <PerfumeList />
     </div>
   );
 };
