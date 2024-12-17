@@ -13,27 +13,7 @@ router.get('/perfumes', async (req, res) => {
   }
 });
 
-// Obtener un perfume por ID
-router.get('/perfumes/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
 
-    // Validar que el ID sea un número válido
-    if (isNaN(id)) {
-      return res.status(400).send('El ID debe ser un número válido.');
-    }
-
-    const perfume = await Perfume.findByPk(id);
-    if (perfume) {
-      res.status(200).json(perfume);
-    } else {
-      res.status(404).send('Perfume no encontrado.');
-    }
-  } catch (error) {
-    console.error('Error al obtener perfume:', error);
-    res.status(500).send('Error al obtener perfume.');
-  }
-});
 
 // Agregar un nuevo perfume
 router.post('/perfumes', async (req, res) => {
@@ -121,5 +101,57 @@ router.delete('/perfumes/:id', async (req, res) => {
     res.status(500).send('Error al eliminar perfume.');
   }
 });
+
+// Resumen del inventario
+router.get('/perfumes/resumen', async (req, res) => {
+  try {
+    // Consultar todos los perfumes
+    const perfumes = await Perfume.findAll({
+      attributes: ['id', 'name', 'total_ml', 'remaining_ml', 'status'], // Seleccionar campos específicos
+    });
+
+    // Calcular el total de ml restantes y perfumes disponibles/no disponibles
+    const totalPerfumes = perfumes.length;
+    const totalMlRestantes = perfumes.reduce((sum, perfume) => sum + perfume.remaining_ml, 0);
+    const perfumesDisponibles = perfumes.filter(perfume => perfume.status === 'Disponible').length;
+    const perfumesNoDisponibles = perfumes.filter(perfume => perfume.status !== 'Disponible').length;
+
+    // Estructura del resumen
+    const resumen = {
+      totalPerfumes,
+      totalMlRestantes,
+      perfumesDisponibles,
+      perfumesNoDisponibles,
+      detallePerfumes: perfumes, // Listado detallado
+    };
+
+    res.status(200).json(resumen);
+  } catch (error) {
+    console.error('Error al obtener el resumen del inventario:', error);
+    res.status(500).send('Error al obtener el resumen del inventario');
+  }
+});
+
+// Obtener un perfume por ID
+router.get('/perfumes/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      // Validar que el ID sea un número válido
+      if (isNaN(id)) {
+        return res.status(400).send('El ID debe ser un número válido.');
+      }
+  
+      const perfume = await Perfume.findByPk(id);
+      if (perfume) {
+        res.status(200).json(perfume);
+      } else {
+        res.status(404).send('Perfume no encontrado.');
+      }
+    } catch (error) {
+      console.error('Error al obtener perfume:', error);
+      res.status(500).send('Error al obtener perfume.');
+    }
+  });
 
 module.exports = router;
