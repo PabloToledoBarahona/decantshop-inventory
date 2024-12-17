@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "migrate": "dotenv -e .env npx sequelize-cli db:migrate"
+    "migrate": "dotenv -e .env npx sequelize-cli db:migrate",
+    "start": "webpack serve --mode development"
   },
   "keywords": [],
   "author": "",
@@ -15,9 +16,21 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "mysql2": "^3.11.5",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "autoprefixer": "^10.4.20",
+    "babel-loader": "^9.2.1",
+    "nodemon": "^3.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.2.0"
   }
 }
