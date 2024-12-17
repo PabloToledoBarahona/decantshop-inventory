@@ -2,6 +2,7 @@ const express = require('express');
 const db = require('./models'); // Importar modelos y la conexión Sequelize
 const perfumeRoutes = require('./routes/perfumeRoutes'); // Importar las rutas
 const decantRoutes = require('./routes/decantRoutes'); // Importar las rutas de decants
+const transferRoutes = require('./routes/transferRoutes'); // Importar rutas de transferencias
 
 const app = express();
 const PORT = 3000;
@@ -13,6 +14,9 @@ app.use('/api', perfumeRoutes);
 
 // Ruta para decants
 app.use('/api', decantRoutes);
+
+// Ruta para las transferencias
+app.use('/api', transferRoutes);
 
 // Prueba de conexión
 app.get('/', async (req, res) => {
