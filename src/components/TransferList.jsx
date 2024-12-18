@@ -77,12 +77,23 @@ const TransferList = () => {
         alert("Seleccione al menos un decant para transferir.");
         return;
       }
-      await axios.post(`${API_BASE_URL}/transfers`, newTransfer);
+  
+      // Formatear datos para el backend
+      const payload = {
+        decant_ids: newTransfer.decants,
+        origen: newTransfer.origen,
+        destino: newTransfer.destino,
+        fecha: new Date().toISOString(), // Opción para enviar la fecha actual
+      };
+  
+      // Enviar transferencia al backend
+      await axios.post(`${API_BASE_URL}/transfers`, payload);
       setNewTransfer({ decants: [], origen: "", destino: "" });
       fetchTransfers();
       fetchStats();
     } catch (error) {
       console.error("Error al realizar la transferencia:", error);
+      alert("Hubo un error al realizar la transferencia.");
     }
   };
 
