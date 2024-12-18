@@ -8,9 +8,14 @@ import AddDecantForm from './components/AddDecantForm';
 const App = () => {
   const [currentPage, setCurrentPage] = useState('list');
 
+  // Función para actualizar perfumes si es necesario
+  const refreshPerfumes = () => {
+    console.log('Perfumes actualizados');
+  };
+
   return (
     <div>
-      <Navbar setCurrentPage={setCurrentPage} />
+      <Navbar setCurrentPage={setCurrentPage} refreshPerfumes={refreshPerfumes} />
       <div className="p-6">
         {currentPage === 'list' && <PerfumeList />}
         {currentPage === 'add' && <AddPerfumeForm />}

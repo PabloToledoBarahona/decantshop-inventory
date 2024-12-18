@@ -52,49 +52,69 @@ const AddPerfume = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h2 className="text-2xl font-bold mb-4 text-center">Agregar Nuevo Perfume</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {success && <p className="text-green-500 mb-4">{success}</p>}
+    <div className="max-w-lg mx-auto p-8 bg-gray-800 text-white rounded-lg shadow-md mt-10">
+      <h2 className="text-3xl font-bold mb-6 text-center">Agregar Nuevo Perfume</h2>
+      {error && (
+        <p className="text-red-400 mb-4 text-center border border-red-400 bg-red-50 rounded-lg p-2 text-red-700">
+          {error}
+        </p>
+      )}
+      {success && (
+        <p className="text-green-400 mb-4 text-center border border-green-400 bg-green-50 rounded-lg p-2 text-green-700">
+          {success}
+        </p>
+      )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="name"
-          placeholder="Nombre del Perfume"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="number"
-          name="total_ml"
-          placeholder="Total ML"
-          value={formData.total_ml}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="number"
-          name="remaining_ml"
-          placeholder="Remaining ML"
-          value={formData.remaining_ml}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        />
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="w-full p-2 border rounded"
-        >
-          <option value="Disponible">Disponible</option>
-          <option value="Agotado">Agotado</option>
-        </select>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label className="block text-gray-400 text-sm mb-1">Nombre del Perfume</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full p-3 border-b-2 bg-gray-800 border-gray-600 focus:outline-none focus:border-gray-400 text-white rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-400 text-sm mb-1">Total ML</label>
+          <input
+            type="number"
+            name="total_ml"
+            value={formData.total_ml}
+            onChange={handleChange}
+            className="w-full p-3 border-b-2 bg-gray-800 border-gray-600 focus:outline-none focus:border-gray-400 text-white rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-400 text-sm mb-1">ML Restantes</label>
+          <input
+            type="number"
+            name="remaining_ml"
+            value={formData.remaining_ml}
+            onChange={handleChange}
+            className="w-full p-3 border-b-2 bg-gray-800 border-gray-600 focus:outline-none focus:border-gray-400 text-white rounded"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-400 text-sm mb-1">Estado</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full p-3 bg-gray-800 border-b-2 border-gray-600 focus:outline-none focus:border-gray-400 text-white rounded"
+          >
+            <option value="Disponible" className="bg-gray-700">Disponible</option>
+            <option value="Agotado" className="bg-gray-700">Agotado</option>
+          </select>
+        </div>
 
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          className="w-full bg-white text-gray-800 font-semibold p-2 rounded hover:bg-gray-300 transition duration-300"
         >
           Agregar Perfume
         </button>
