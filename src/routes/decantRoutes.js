@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Decant, Perfume } = require('../models'); // Importa los modelos
+const { Sequelize } = require('sequelize'); // Importar Sequelize para funciones agregadas
 
 // Obtener todos los decants
 router.get('/decants', async (req, res) => {
@@ -128,6 +129,34 @@ router.get('/decants/maleta/:maleta_destino', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener decants por maleta:', error);
     res.status(500).send('Error al obtener decants por maleta');
+  }
+});
+
+// Resumen de decants
+router.get('/decants/resumen', async (req, res) => {
+  try {
+    const resumen = await Decant.findAll({
+      attributes: [
+        [Sequelize.fn('SUM', Sequelize.col('cantidad')), 'totalMlDecants'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'totalDecants'],
+      ],
+      raw: true,
+    });
+
+    const porMaleta = await Decant.findAll({
+      attributes: [
+        'maleta_destino',
+        [Sequelize.fn('SUM', Sequelize.col('cantidad')), 'totalMlPorMaleta'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'totalDecantsPorMaleta'],
+      ],
+      group: ['maleta_destino'],
+      raw: true,
+    });
+
+    res.status(200).json({ resumen, porMaleta });
+  } catch (error) {
+    console.error('Error al obtener el resumen de decants:', error);
+    res.status(500).send('Error al obtener el resumen de decants');
   }
 });
 
