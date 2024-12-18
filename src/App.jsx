@@ -5,6 +5,7 @@ import AddPerfumeForm from './components/AddPerfumeForm';
 import DecantList from './components/DecantList';
 import AddDecantForm from './components/AddDecantForm';
 import InventorySummary from './components/InventorySummary';
+import TransferList from './components/TransferList';
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home'); // Cambiado a 'home' como página inicial
@@ -23,6 +24,7 @@ const App = () => {
         {currentPage === 'add' && <AddPerfumeForm />}
         {currentPage === 'decants' && <DecantList />}
         {currentPage === 'addDecant' && <AddDecantForm onAdd={() => setCurrentPage('decants')} />}
+        {currentPage === 'transfers' && <TransferList />}
       </div>
     </div>
   );

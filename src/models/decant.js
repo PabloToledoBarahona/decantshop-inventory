@@ -3,16 +3,10 @@ const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Decant extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // Relación: Decant pertenece a Perfume
       Decant.belongsTo(models.Perfume, {
         foreignKey: 'perfume_id',
-        as: 'perfume', // Alias
+        as: 'associatedPerfume', // Alias único para evitar conflictos
       });
     }
   }
@@ -35,8 +29,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Decant',
-      tableName: 'Decants', // Opcional si quieres forzar el nombre de la tabla
-      timestamps: true, // Para createdAt y updatedAt
+      tableName: 'Decants',
+      timestamps: true,
     }
   );
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus } from 'react-icons/fi';
+import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus, FiShuffle } from 'react-icons/fi';
 
 const Navbar = ({ setCurrentPage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -44,16 +44,7 @@ const Navbar = ({ setCurrentPage }) => {
               className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
               <FiList />
-              Lista de Perfumes
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => handleNavigation('add')}
-              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
-            >
-              <FiPlusCircle />
-              Agregar Perfume
+              Perfumes
             </button>
           </li>
           <li>
@@ -62,7 +53,16 @@ const Navbar = ({ setCurrentPage }) => {
               className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
               <FiPackage />
-              Lista de Decants
+              Decants
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleNavigation('add')}
+              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+            >
+              <FiPlusCircle />
+              Perfume
             </button>
           </li>
           <li>
@@ -71,18 +71,19 @@ const Navbar = ({ setCurrentPage }) => {
               className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
               <FiUserPlus />
-              Agregar Decant
+              Decant
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => handleNavigation('transfers')}
+              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+            >
+              <FiShuffle />
+              Transferencias
             </button>
           </li>
         </ul>
-
-        {/* Perfil */}
-        <div className="hidden lg:flex items-center space-x-3">
-          <span className="text-gray-300 font-medium">Pablo Toledo</span>
-          <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center shadow-md cursor-pointer hover:bg-gray-500 transition duration-300">
-            <span className="text-white font-semibold">P</span>
-          </div>
-        </div>
       </div>
     </nav>
   );
