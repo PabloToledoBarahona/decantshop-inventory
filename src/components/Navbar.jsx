@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiMenu, FiX } from 'react-icons/fi';
+import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus } from 'react-icons/fi';
 
 const Navbar = ({ setCurrentPage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,7 +14,7 @@ const Navbar = ({ setCurrentPage }) => {
   };
 
   return (
-    <nav className="bg-gray-700 p-4 shadow-lg sticky top-0 z-50">
+    <nav className="bg-gray-800 p-4 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
         <div
@@ -34,39 +34,43 @@ const Navbar = ({ setCurrentPage }) => {
 
         {/* Menú de navegación */}
         <ul
-          className={`lg:flex lg:space-x-8 text-gray-300 text-lg lg:static absolute top-full left-0 w-full bg-gray-700 lg:bg-transparent lg:w-auto ${
+          className={`lg:flex lg:space-x-8 text-gray-300 text-lg lg:static absolute top-full left-0 w-full bg-gray-800 lg:bg-transparent lg:w-auto ${
             isMenuOpen ? 'block' : 'hidden'
           }`}
         >
           <li>
             <button
               onClick={() => handleNavigation('list')}
-              className="block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
+              <FiList />
               Lista de Perfumes
             </button>
           </li>
           <li>
             <button
               onClick={() => handleNavigation('add')}
-              className="block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
+              <FiPlusCircle />
               Agregar Perfume
             </button>
           </li>
           <li>
             <button
               onClick={() => handleNavigation('decants')}
-              className="block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
+              <FiPackage />
               Lista de Decants
             </button>
           </li>
           <li>
             <button
               onClick={() => handleNavigation('addDecant')}
-              className="block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
             >
+              <FiUserPlus />
               Agregar Decant
             </button>
           </li>
