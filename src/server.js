@@ -19,7 +19,7 @@ app.use('/api', transferRoutes);
 // Prueba de conexión
 app.get('/', async (req, res) => {
   try {
-    await db.authenticate();
+    await db.sequelize.authenticate();
     console.log('Conexión a la base de datos exitosa.');
     res.send('¡Servidor funcionando correctamente!');
   } catch (error) {
