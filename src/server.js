@@ -4,6 +4,7 @@ const db = require('./models'); // Importar modelos y la conexión Sequelize
 const perfumeRoutes = require('./routes/perfumeRoutes');
 const decantRoutes = require('./routes/decantRoutes');
 const transferRoutes = require('./routes/transferRoutes');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
