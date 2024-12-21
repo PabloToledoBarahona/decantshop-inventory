@@ -59,6 +59,15 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
+// Sincronizar la base de datos (¡Solo en desarrollo!)
+db.sequelize.sync({ force: false })
+  .then(() => {
+    console.log('✅ Tablas sincronizadas correctamente.');
+  })
+  .catch((error) => {
+    console.error('❌ Error al sincronizar las tablas:', error);
+  });
+
 // ✅ Manejador de rutas no encontradas (colocado al final)
 app.use('*', (req, res) => {
   res.status(404).send('❌ Ruta no encontrada. Asegúrate de usar una ruta válida.');
