@@ -1,74 +1,85 @@
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const process = require('process');
 require('dotenv').config();
 
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require('../config/database.js')[env];
 
-console.log('Iniciando configuración de base de datos...');
-console.log('Ambiente:', env);
-console.log('Host:', config.host);
-console.log('Puerto:', config.port);
-console.log('Base de datos:', config.database);
+const config = {
+  development: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql'
+  },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql',
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false
+      }
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
+  }
+};
 
 const db = {};
 let sequelize;
 
-try {
-  sequelize = new Sequelize(
-    config.database,
-    config.username,
-    config.password,
-    {
-      host: config.host,
-      port: config.port,
-      dialect: config.dialect,
-      dialectOptions: config.dialectOptions,
-      pool: config.pool,
-      logging: config.logging
-    }
-  );
+// Usa la configuración según el entorno
+sequelize = new Sequelize(
+  config[env].database,
+  config[env].username,
+  config[env].password,
+  config[env]
+);
 
-  console.log('Instancia de Sequelize creada');
-} catch (error) {
-  console.error('Error al crear instancia de Sequelize:', error);
-  process.exit(1);
-}
-
+// Lee los modelos
 fs.readdirSync(__dirname)
-  .filter(file => {
+  .filter((file) => {
     return (
       file.indexOf('.') !== 0 &&
       file !== basename &&
-      file.slice(-3) === '.js' &&
-      file.indexOf('.test.js') === -1
+      file.slice(-3) === '.js'
     );
   })
-  .forEach(file => {
-    try {
-      const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes);
-      db[model.name] = model;
-      console.log(`Modelo cargado: ${model.name}`);
-    } catch (error) {
-      console.error(`Error al cargar el modelo ${file}:`, error);
-    }
+  .forEach((file) => {
+    const model = require(path.join(__dirname, file))(
+      sequelize,
+      Sequelize.DataTypes
+    );
+    db[model.name] = model;
   });
 
-Object.keys(db).forEach(modelName => {
+// Asociaciones
+Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
-    try {
-      db[modelName].associate(db);
-      console.log(`Asociaciones cargadas para: ${modelName}`);
-    } catch (error) {
-      console.error(`Error al asociar el modelo ${modelName}:`, error);
-    }
+    db[modelName].associate(db);
   }
 });
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+// Solo log básico en producción
+if (env !== 'production') {
+  console.log('Configuración Sequelize:');
+  console.log('Ambiente:', env);
+  console.log('Host:', config[env].host);
+  console.log('Database:', config[env].database);
+}
 
 module.exports = db;
