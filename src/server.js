@@ -63,3 +63,13 @@ app.use((err, req, res, next) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
+app.get('/ping-db', async (req, res) => {
+  try {
+    await db.sequelize.authenticate();
+    res.status(200).send('✅ Conexión a la base de datos exitosa.');
+  } catch (error) {
+    console.error('❌ Error al conectar con la base de datos:', error);
+    res.status(500).send('❌ Error al conectar con la base de datos.');
+  }
+});
