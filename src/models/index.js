@@ -5,30 +5,49 @@ require('dotenv').config();
 
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
+
 const config = {
-  username: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: 'mysql',
+  development: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql'
+  },
+  production: {
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: 'mysql',
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false
+      }
+    },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
+  }
 };
 
 const db = {};
 let sequelize;
 
+// Usa la configuración según el entorno
 sequelize = new Sequelize(
-  config.database,
-  config.username,
-  config.password,
-  {
-    host: config.host,
-    port: config.port,
-    dialect: config.dialect,
-    logging: false,
-  }
+  config[env].database,
+  config[env].username,
+  config[env].password,
+  config[env]
 );
 
+// Lee los modelos
 fs.readdirSync(__dirname)
   .filter((file) => {
     return (
@@ -45,6 +64,7 @@ fs.readdirSync(__dirname)
     db[model.name] = model;
   });
 
+// Asociaciones
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
@@ -54,11 +74,12 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-module.exports = db;
+// Solo log básico en producción
+if (env !== 'production') {
+  console.log('Configuración Sequelize:');
+  console.log('Ambiente:', env);
+  console.log('Host:', config[env].host);
+  console.log('Database:', config[env].database);
+}
 
-console.log('Configuración Sequelize:');
-console.log('DB_USER:', process.env.DB_USER);
-console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
-console.log('DB_NAME:', process.env.DB_NAME);
-console.log('DB_HOST:', process.env.DB_HOST);
-console.log('DB_PORT:', process.env.DB_PORT);
+module.exports = db;

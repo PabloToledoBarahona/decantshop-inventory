@@ -11,7 +11,6 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 8080;
-console.log(`Servidor escuchando en el puerto ${PORT}`);
 
 // Rutas
 app.use('/api', perfumeRoutes);
@@ -21,17 +20,13 @@ app.use('/api', transferRoutes);
 // Prueba de conexión
 app.get('/', async (req, res) => {
   try {
-    await db.authenticate();
+    await db.sequelize.authenticate();
     console.log('Conexión a la base de datos exitosa.');
     res.send('¡Servidor funcionando correctamente!');
   } catch (error) {
     console.error('Error al conectar a la base de datos:', error);
     res.status(500).send('Error al conectar a la base de datos');
   }
-});
-
-app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
 
 app.get('/test-db', async (req, res) => {
@@ -45,11 +40,19 @@ app.get('/test-db', async (req, res) => {
 });
 
 app.get('/check-env', (req, res) => {
+  // En producción, es mejor no exponer las variables de entorno
   res.json({
-    DB_USER: process.env.DB_USER,
-    DB_PASSWORD: process.env.DB_PASSWORD,
-    DB_NAME: process.env.DB_NAME,
-    DB_HOST: process.env.DB_HOST,
-    DB_PORT: process.env.DB_PORT,
+    connected: true,
+    environment: process.env.NODE_ENV
   });
+});
+
+// Manejo de errores global
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('¡Algo salió mal!');
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
