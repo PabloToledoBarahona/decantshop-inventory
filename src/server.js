@@ -32,3 +32,13 @@ app.get('/', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
+
+app.get('/test-db', async (req, res) => {
+  try {
+    await db.sequelize.authenticate();
+    res.status(200).send('Conexión a la base de datos exitosa desde Railway.');
+  } catch (error) {
+    console.error('Error al conectar con la base de datos:', error);
+    res.status(500).send('Error al conectar con la base de datos.');
+  }
+});
