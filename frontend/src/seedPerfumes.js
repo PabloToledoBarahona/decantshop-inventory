@@ -1,5 +1,5 @@
-const db = require('./models'); // Importar modelos y conexión Sequelize
-const Perfume = require('./models').Perfume;
+const db = require('../../../backend/models'); // Importar modelos y conexión Sequelize
+const Perfume = require('../../../backend/models').Perfume;
 
 const perfumes = [
   { name: "Carolina Herrera 212 MEN EDT", total_ml: 200, remaining_ml: 200, status: "Disponible" },
