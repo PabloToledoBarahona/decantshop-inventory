@@ -7,9 +7,9 @@ const transferRoutes = require('./routes/transferRoutes');
 
 const app = express();
 app.use(cors());
-const PORT = process.env.PORT || 3000;
-
 app.use(express.json());
+
+const PORT = process.env.PORT || 3000;
 
 // Rutas
 app.use('/api', perfumeRoutes);
@@ -19,7 +19,7 @@ app.use('/api', transferRoutes);
 // Prueba de conexión
 app.get('/', async (req, res) => {
   try {
-    await db.sequelize.authenticate();
+    await db.authenticate();
     console.log('Conexión a la base de datos exitosa.');
     res.send('¡Servidor funcionando correctamente!');
   } catch (error) {
