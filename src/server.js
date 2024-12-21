@@ -43,3 +43,13 @@ app.get('/test-db', async (req, res) => {
     res.status(500).send('Error al conectar con la base de datos.');
   }
 });
+
+app.get('/check-env', (req, res) => {
+  res.json({
+    DB_USER: process.env.DB_USER,
+    DB_PASSWORD: process.env.DB_PASSWORD,
+    DB_NAME: process.env.DB_NAME,
+    DB_HOST: process.env.DB_HOST,
+    DB_PORT: process.env.DB_PORT,
+  });
+});
