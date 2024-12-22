@@ -33,9 +33,11 @@ const TransferList = () => {
   const fetchStats = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/transfers/stats`);
-      setStats(response.data || {});
+      if (response.data) {
+        setStats(response.data);
+      }
     } catch (error) {
-      console.error("Error al obtener estadísticas:", error);
+      console.error("❌ Error al obtener estadísticas:", error.response?.data || error.message);
       setError("No se pudieron obtener las estadísticas.");
     }
   };

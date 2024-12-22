@@ -13,26 +13,28 @@ const InventorySummary = () => {
 
   const fetchSummaries = async () => {
     try {
-      // Fetch resumen de perfumes
+      // ✅ Fetch resumen de perfumes
       const perfumeResponse = await axios.get(`${API_BASE_URL}/perfumes/resumen`);
       setPerfumeSummary(perfumeResponse.data || {});
-  
-      // Fetch resumen de decants
+
+      // ✅ Fetch resumen de decants
       const decantResponse = await axios.get(`${API_BASE_URL}/decants/resumen`);
-      setDecantSummary({
-        totalDecants: decantResponse.data?.resumen?.[0]?.totalDecants || 0,
-        totalMlEnDecants: decantResponse.data?.resumen?.[0]?.totalMlDecants || 0,
-        decantsEnMaletaPablo:
-          decantResponse.data?.porMaleta?.find(
-            (item) => item.maleta_destino === "Pablo"
-          )?.totalDecantsPorMaleta || 0,
-        decantsEnMaletaJoseCarlos:
-          decantResponse.data?.porMaleta?.find(
-            (item) => item.maleta_destino === "Jose Carlos"
-          )?.totalDecantsPorMaleta || 0,
-      });
+      if (decantResponse.data) {
+        setDecantSummary({
+          totalDecants: decantResponse.data?.resumen?.[0]?.totalDecants || 0,
+          totalMlEnDecants: decantResponse.data?.resumen?.[0]?.totalMlDecants || 0,
+          decantsEnMaletaPablo:
+            decantResponse.data?.porMaleta?.find(
+              (item) => item.maleta_destino === "Pablo"
+            )?.totalDecantsPorMaleta || 0,
+          decantsEnMaletaJoseCarlos:
+            decantResponse.data?.porMaleta?.find(
+              (item) => item.maleta_destino === "Jose Carlos"
+            )?.totalDecantsPorMaleta || 0,
+        });
+      }
     } catch (error) {
-      console.error("Error al obtener los resúmenes:", error);
+      console.error("❌ Error al obtener los resúmenes:", error.response?.data || error.message);
       setError("No se pudieron obtener los resúmenes.");
     }
   };
@@ -67,18 +69,6 @@ const InventorySummary = () => {
               {perfumeSummary.totalMlRestantes} ml
             </p>
           </div>
-          <div className="bg-gray-700 p-4 rounded-lg shadow">
-            <p className="font-semibold">Perfumes Disponibles</p>
-            <p className="text-2xl font-bold text-green-400">
-              {perfumeSummary.perfumesDisponibles}
-            </p>
-          </div>
-          <div className="bg-gray-700 p-4 rounded-lg shadow">
-            <p className="font-semibold">Perfumes No Disponibles</p>
-            <p className="text-2xl font-bold text-red-400">
-              {perfumeSummary.perfumesNoDisponibles}
-            </p>
-          </div>
         </div>
       </div>
 
@@ -93,21 +83,9 @@ const InventorySummary = () => {
             </p>
           </div>
           <div className="bg-gray-700 p-4 rounded-lg shadow">
-            <p className="font-semibold">Total de ML en Decants</p>
-            <p className="text-2xl font-bold text-green-400">
-              {decantSummary.totalMlEnDecants} ml
-            </p>
-          </div>
-          <div className="bg-gray-700 p-4 rounded-lg shadow">
             <p className="font-semibold">Decants en Maleta Pablo</p>
             <p className="text-2xl font-bold text-blue-400">
               {decantSummary.decantsEnMaletaPablo}
-            </p>
-          </div>
-          <div className="bg-gray-700 p-4 rounded-lg shadow">
-            <p className="font-semibold">Decants en Maleta Jose Carlos</p>
-            <p className="text-2xl font-bold text-blue-400">
-              {decantSummary.decantsEnMaletaJoseCarlos}
             </p>
           </div>
         </div>
