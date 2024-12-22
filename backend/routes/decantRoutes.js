@@ -4,70 +4,63 @@ const { Decant, Perfume } = require('../models'); // Importa los modelos
 const { Sequelize } = require('sequelize'); // Importar Sequelize para funciones agregadas
 
 // Obtener todos los decants
-router.get('/decants', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const decants = await Decant.findAll({
       include: [
         {
           model: Perfume,
-          as: 'perfume', // Especificar alias correcto
+          as: 'perfume', // Asegúrate de que este alias coincida en el modelo
         },
       ],
     });
     res.status(200).json(decants);
   } catch (error) {
-    console.error('Error al obtener decants:', error);
-    res.status(500).send('Error al obtener decants');
+    console.error('❌ Error al obtener decants:', error);
+    res.status(500).send('❌ Error al obtener decants');
   }
 });
 
 // Agregar un nuevo decant
-router.post('/decants', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const { perfume_id, cantidad, maleta_destino } = req.body;
 
-    // Validar campos obligatorios
     if (!perfume_id || !cantidad || !maleta_destino) {
-      return res.status(400).send('Todos los campos (perfume_id, cantidad, maleta_destino) son obligatorios.');
+      return res.status(400).send('❌ Todos los campos son obligatorios.');
     }
 
-    // Validar que la cantidad sea positiva
     if (cantidad <= 0) {
-      return res.status(400).send('La cantidad debe ser un número positivo.');
+      return res.status(400).send('❌ La cantidad debe ser un número positivo.');
     }
 
-    // Validar que la maleta destino sea válida
     const maletasPermitidas = ['Pablo', 'Jose Carlos'];
     if (!maletasPermitidas.includes(maleta_destino)) {
-      return res.status(400).send('Maleta destino no válida. Use "Pablo" o "Jose Carlos".');
+      return res.status(400).send('❌ Maleta destino no válida.');
     }
 
-    // Buscar el perfume asociado
     const perfume = await Perfume.findByPk(perfume_id);
     if (!perfume) {
-      return res.status(404).send('Perfume no encontrado.');
+      return res.status(404).send('❌ Perfume no encontrado.');
     }
 
-    // Validar cantidad restante del perfume
     if (perfume.remaining_ml < cantidad) {
-      return res.status(400).send('No hay suficiente cantidad en el perfume.');
+      return res.status(400).send('❌ No hay suficiente cantidad disponible.');
     }
 
-    // Crear el decant
     const nuevoDecant = await Decant.create({
       perfume_id,
       cantidad,
       maleta_destino,
     });
 
-    // Actualizar los ml restantes del perfume
     perfume.remaining_ml -= cantidad;
     await perfume.save();
 
     res.status(201).json(nuevoDecant);
   } catch (error) {
-    console.error('Error al agregar decant:', error);
-    res.status(500).send('Error al agregar decant');
+    console.error('❌ Error al agregar decant:', error);
+    res.status(500).send('❌ Error al agregar decant');
   }
 });
 

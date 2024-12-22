@@ -6,22 +6,22 @@ const { Transfer, Decant, Perfume } = require("../models"); // Importa los model
 Transfer.belongsTo(Decant, { foreignKey: "decant_id", as: "decant" });
 Decant.belongsTo(Perfume, { foreignKey: "perfume_id", as: "perfume" });
 
-// Obtener todas las transferencias con detalles de los decants y perfumes
-router.get("/transfers", async (req, res) => {
+// Obtener todas las transferencias
+router.get('/', async (req, res) => {
   try {
     const transfers = await Transfer.findAll({
       include: [
         {
           model: Decant,
-          as: "decant",
-          include: [{ model: Perfume, as: "perfume" }],
+          as: 'decant',
+          include: [{ model: Perfume, as: 'perfume' }],
         },
       ],
     });
     res.status(200).json(transfers);
   } catch (error) {
-    console.error("Error al obtener transferencias:", error);
-    res.status(500).send("Error al obtener transferencias.");
+    console.error('❌ Error al obtener transferencias:', error);
+    res.status(500).send('❌ Error al obtener transferencias.');
   }
 });
 
