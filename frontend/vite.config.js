@@ -4,16 +4,14 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL,
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    port: 5173,
   },
   build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
+    outDir: 'dist', // Directorio de salida para el build
+  },
+  resolve: {
+    alias: {
+      '@': '/src', // Alias para acceder más fácilmente a la carpeta src
+    },
   },
 });
