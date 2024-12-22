@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('backend/models'); // Importar modelos y la conexión Sequelize
-const perfumeRoutes = require('backend/routes/perfumeRoutes.js');
-const decantRoutes = require('backend/routes/decantRoutes.js');
-const transferRoutes = require('backend/routes/transferRoutes.js');
+const db = require('./models'); // ✅ Ruta relativa para modelos
+const perfumeRoutes = require('./routes/perfumeRoutes'); // ✅ Ruta relativa para rutas
+const decantRoutes = require('./routes/decantRoutes');
+const transferRoutes = require('./routes/transferRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -21,9 +21,9 @@ app.use(express.json());
 const PORT = process.env.PORT || 8080;
 
 // ✅ Rutas específicas para funcionalidades
-app.use('/api', perfumeRoutes);
-app.use('/api', decantRoutes);
-app.use('/api', transferRoutes);
+app.use('/api/perfumes', perfumeRoutes);
+app.use('/api/decants', decantRoutes);
+app.use('/api/transfers', transferRoutes);
 
 // ✅ Prueba de conexión a la base de datos
 app.get('/ping-db', async (req, res) => {
@@ -59,14 +59,16 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-// Sincronizar la base de datos (¡Solo en desarrollo!)
-db.sequelize.sync({ force: false })
-  .then(() => {
-    console.log('✅ Tablas sincronizadas correctamente.');
-  })
-  .catch((error) => {
-    console.error('❌ Error al sincronizar las tablas:', error);
-  });
+// ✅ Sincronizar la base de datos (¡Solo en desarrollo!)
+if (process.env.NODE_ENV !== 'production') {
+  db.sequelize.sync({ force: false })
+    .then(() => {
+      console.log('✅ Tablas sincronizadas correctamente.');
+    })
+    .catch((error) => {
+      console.error('❌ Error al sincronizar las tablas:', error);
+    });
+}
 
 // ✅ Manejador de rutas no encontradas (colocado al final)
 app.use('*', (req, res) => {
