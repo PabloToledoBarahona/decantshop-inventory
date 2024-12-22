@@ -8,13 +8,16 @@ export default defineConfig({
     port: 5173,
   },
   build: {
-    outDir: 'dist', // Directorio de salida para el build
-    emptyOutDir: true, // Limpia el directorio de salida antes de construir
+    outDir: 'dist',
+    emptyOutDir: true,
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'), // Usa path para resolver rutas absolutas
+      '@': path.resolve(__dirname, './src'),
     },
   },
-  base: '/', // Asegura que Vite entienda el punto de entrada en producción
+  css: {
+    postcss: path.resolve(__dirname, './postcss.config.js'), // Agrega referencia explícita a postcss
+  },
+  base: '/',
 });
