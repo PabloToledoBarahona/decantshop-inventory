@@ -13,7 +13,7 @@ const PerfumeList = () => {
   const fetchPerfumes = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/perfumes`);
-      setPerfumes(response.data);
+      setPerfumes(response.data || []);
     } catch (error) {
       console.error('Error al obtener perfumes:', error);
     }

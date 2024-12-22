@@ -23,7 +23,8 @@ const TransferList = () => {
   const fetchTransfers = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/transfers`);
-      setTransfers(response.data);
+      setTransfers(response.data || []);
+      setStats(response.data || {});
     } catch (error) {
       console.error("Error al obtener transferencias:", error);
       setError("No se pudieron obtener las transferencias.");
@@ -77,7 +78,7 @@ const TransferList = () => {
         alert("Seleccione al menos un decant para transferir.");
         return;
       }
-  
+
       // Formatear datos para el backend
       const payload = {
         decant_ids: newTransfer.decants,
@@ -85,7 +86,7 @@ const TransferList = () => {
         destino: newTransfer.destino,
         fecha: new Date().toISOString(), // Opción para enviar la fecha actual
       };
-  
+
       // Enviar transferencia al backend
       await axios.post(`${API_BASE_URL}/transfers`, payload);
       setNewTransfer({ decants: [], origen: "", destino: "" });
@@ -103,27 +104,37 @@ const TransferList = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-gray-800 rounded-lg shadow-md text-white">
-      <h2 className="text-2xl font-bold mb-6 text-center">Dashboard de Transferencias</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">
+        Dashboard de Transferencias
+      </h2>
 
       {/* Estadísticas */}
       {stats && (
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-gray-700 p-4 rounded-lg shadow">
             <p className="font-semibold">Total Transferencias</p>
-            <p className="text-2xl font-bold text-blue-400">{stats.totalTransfers}</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {stats.totalTransfers}
+            </p>
           </div>
           <div className="bg-gray-700 p-4 rounded-lg shadow">
             <p className="font-semibold">Transferencias desde Pablo</p>
-            <p className="text-2xl font-bold text-green-400">{stats.fromPablo}</p>
+            <p className="text-2xl font-bold text-green-400">
+              {stats.fromPablo}
+            </p>
           </div>
           <div className="bg-gray-700 p-4 rounded-lg shadow">
             <p className="font-semibold">Transferencias desde Jose Carlos</p>
-            <p className="text-2xl font-bold text-green-400">{stats.fromJoseCarlos}</p>
+            <p className="text-2xl font-bold text-green-400">
+              {stats.fromJoseCarlos}
+            </p>
           </div>
           <div className="bg-gray-700 p-4 rounded-lg shadow">
             <p className="font-semibold">Última Transferencia</p>
             <p className="text-2xl font-bold text-red-400">
-              {stats.lastTransferDate ? new Date(stats.lastTransferDate).toLocaleString() : "N/A"}
+              {stats.lastTransferDate
+                ? new Date(stats.lastTransferDate).toLocaleString()
+                : "N/A"}
             </p>
           </div>
         </div>
@@ -131,7 +142,9 @@ const TransferList = () => {
 
       {/* Formulario para crear transferencias */}
       <div className="bg-gray-700 p-4 rounded-lg shadow mb-6">
-        <h3 className="text-lg font-semibold mb-4">Realizar Nueva Transferencia</h3>
+        <h3 className="text-lg font-semibold mb-4">
+          Realizar Nueva Transferencia
+        </h3>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4">
           <div className="bg-gray-800 p-4 rounded-lg">
             <p className="font-semibold mb-2">Seleccionar Decants:</p>
@@ -145,7 +158,8 @@ const TransferList = () => {
                     onChange={() => handleDecantSelection(decant.id)}
                   />
                   <span>
-                    {decant.id} - {decant.perfume ? decant.perfume.name : "Desconocido"}
+                    {decant.id} -{" "}
+                    {decant.perfume ? decant.perfume.name : "Desconocido"}
                   </span>
                 </label>
               ))}
@@ -203,7 +217,10 @@ const TransferList = () => {
         </thead>
         <tbody>
           {transfers.map((transfer) => (
-            <tr key={transfer.id} className="border-t border-gray-600 hover:bg-gray-700">
+            <tr
+              key={transfer.id}
+              className="border-t border-gray-600 hover:bg-gray-700"
+            >
               <td className="px-4 py-2">{transfer.id}</td>
               <td className="px-4 py-2">{transfer.decant_id}</td>
               <td className="px-4 py-2">
@@ -213,7 +230,9 @@ const TransferList = () => {
               </td>
               <td className="px-4 py-2">{transfer.origen}</td>
               <td className="px-4 py-2">{transfer.destino}</td>
-              <td className="px-4 py-2">{new Date(transfer.fecha).toLocaleString()}</td>
+              <td className="px-4 py-2">
+                {new Date(transfer.fecha).toLocaleString()}
+              </td>
             </tr>
           ))}
         </tbody>

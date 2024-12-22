@@ -10,7 +10,7 @@ const DecantList = () => {
   const fetchDecants = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/decants`);
-      setDecants(response.data);
+      setDecants(response.data || []);
     } catch (error) {
       console.error('Error al obtener decants:', error);
     }
