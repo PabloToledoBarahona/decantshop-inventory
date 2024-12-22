@@ -1,10 +1,5 @@
-import FiMenu from 'react-icons/fi/FI';
-import FiX from 'react-icons/fi/FiX';
-import FiList from 'react-icons/fi/FiList';
-import FiPlusCircle from 'react-icons/fi/FiPlusCircle';
-import FiPackage from 'react-icons/fi/FiPackage';
-import FiUserPlus from 'react-icons/fi/FiUserPlus';
-import FiShuffle from 'react-icons/fi/FiShuffle';
+import React, { useState } from 'react';
+import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus, FiShuffle } from 'react-icons/fi';
 
 const Navbar = ({ setCurrentPage }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
