@@ -59,6 +59,15 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
+router.get('/', (req, res) => {
+  res.send('Ruta de Perfumes funcionando correctamente');
+});
+
+console.log('Rutas cargadas:');
+console.log('Perfumes → /api/perfumes');
+console.log('Decants → /api/decants');
+console.log('Transfers → /api/transfers');
+
 // ✅ Sincronizar la base de datos (¡Solo en desarrollo!)
 if (process.env.NODE_ENV !== 'production') {
   db.sequelize.sync({ force: false })
@@ -84,4 +93,16 @@ app.use((err, req, res, next) => {
 // ✅ Iniciar servidor
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Servidor corriendo en el puerto ${PORT}`);
+});
+
+app._router.stack.forEach((middleware) => {
+  if (middleware.route) {
+    console.log(`Ruta: ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    middleware.handle.stack.forEach((handler) => {
+      if (handler.route) {
+        console.log(`Ruta: ${handler.route.path}`);
+      }
+    });
+  }
 });
