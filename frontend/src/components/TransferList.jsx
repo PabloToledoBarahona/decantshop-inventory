@@ -19,23 +19,21 @@ const TransferList = () => {
     fetchDecants();
   }, []);
 
-  // Fetch transferencias
   const fetchTransfers = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/transfers`);
       setTransfers(response.data || []);
-      setStats(response.data || {});
     } catch (error) {
       console.error("Error al obtener transferencias:", error);
       setError("No se pudieron obtener las transferencias.");
     }
   };
-
+  
   // Fetch estadísticas
   const fetchStats = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/transfers/stats`);
-      setStats(response.data);
+      setStats(response.data || {});
     } catch (error) {
       console.error("Error al obtener estadísticas:", error);
       setError("No se pudieron obtener las estadísticas.");

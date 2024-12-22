@@ -37,7 +37,7 @@ const AddPerfume = () => {
       }
 
       // Enviar los datos a la API
-      await axios.post('http://localhost:3000/api/perfumes', formData);
+      await axios.post(`${API_BASE_URL}/perfumes`, formData);
       setSuccess('Perfume agregado exitosamente.');
       setFormData({
         name: '',

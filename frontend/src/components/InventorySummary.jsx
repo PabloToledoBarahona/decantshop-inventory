@@ -14,35 +14,20 @@ const InventorySummary = () => {
   const fetchSummaries = async () => {
     try {
       // Fetch resumen de perfumes
-      const perfumeResponse = await axios.get(
-        `${API_BASE_URL}/perfumes/resumen`
-      );
+      const perfumeResponse = await axios.get(`${API_BASE_URL}/perfumes/resumen`);
       setPerfumeSummary(perfumeResponse.data || {});
-      setDecantSummary({
-        totalDecants: decantResponse.data?.resumen?.[0]?.totalDecants || 0,
-        totalMlEnDecants:
-          decantResponse.data?.resumen?.[0]?.totalMlDecants || 0,
-        decantsEnMaletaPablo:
-          decantResponse.data?.porMaleta?.find(
-            (item) => item.maleta_destino === "Pablo"
-          )?.totalDecantsPorMaleta || 0,
-        decantsEnMaletaJoseCarlos:
-          decantResponse.data?.porMaleta?.find(
-            (item) => item.maleta_destino === "Jose Carlos"
-          )?.totalDecantsPorMaleta || 0,
-      });
-
+  
       // Fetch resumen de decants
       const decantResponse = await axios.get(`${API_BASE_URL}/decants/resumen`);
       setDecantSummary({
-        totalDecants: decantResponse.data.resumen[0]?.totalDecants || 0,
-        totalMlEnDecants: decantResponse.data.resumen[0]?.totalMlDecants || 0,
+        totalDecants: decantResponse.data?.resumen?.[0]?.totalDecants || 0,
+        totalMlEnDecants: decantResponse.data?.resumen?.[0]?.totalMlDecants || 0,
         decantsEnMaletaPablo:
-          decantResponse.data.porMaleta.find(
+          decantResponse.data?.porMaleta?.find(
             (item) => item.maleta_destino === "Pablo"
           )?.totalDecantsPorMaleta || 0,
         decantsEnMaletaJoseCarlos:
-          decantResponse.data.porMaleta.find(
+          decantResponse.data?.porMaleta?.find(
             (item) => item.maleta_destino === "Jose Carlos"
           )?.totalDecantsPorMaleta || 0,
       });
