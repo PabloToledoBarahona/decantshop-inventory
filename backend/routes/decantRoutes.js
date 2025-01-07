@@ -48,22 +48,23 @@ router.get('/maleta/:maleta_destino', async (req, res) => {
   }
 });
 
-// ✅ Agregar un nuevo decant
+// ✅ Agregar uno o varios decants
 router.post('/', async (req, res) => {
   try {
-    const { perfume_id, cantidad, maleta_destino } = req.body;
+    const { perfume_id, cantidad, maleta_destino, cantidad_decants = 1 } = req.body;
 
+    // Validaciones de campos obligatorios
     if (!perfume_id || !cantidad || !maleta_destino) {
       return res.status(400).send('❌ Todos los campos son obligatorios.');
     }
 
-    if (cantidad <= 0) {
-      return res.status(400).send('❌ La cantidad debe ser un número positivo.');
+    if (cantidad <= 0 || cantidad_decants <= 0) {
+      return res.status(400).send('❌ La cantidad y cantidad_decants deben ser números positivos.');
     }
 
     const maletasPermitidas = ['Pablo', 'Jose Carlos'];
     if (!maletasPermitidas.includes(maleta_destino)) {
-      return res.status(400).send('❌ Maleta destino no válida.');
+      return res.status(400).send('❌ Maleta destino no válida. Use "Pablo" o "Jose Carlos".');
     }
 
     const perfume = await Perfume.findByPk(perfume_id);
@@ -71,23 +72,33 @@ router.post('/', async (req, res) => {
       return res.status(404).send('❌ Perfume no encontrado.');
     }
 
-    if (perfume.remaining_ml < cantidad) {
-      return res.status(400).send('❌ No hay suficiente cantidad disponible.');
+    const totalMlRequeridos = cantidad * cantidad_decants;
+    if (perfume.remaining_ml < totalMlRequeridos) {
+      return res.status(400).send('❌ No hay suficiente cantidad disponible para todos los decants.');
     }
 
-    const nuevoDecant = await Decant.create({
-      perfume_id,
-      cantidad,
-      maleta_destino,
-    });
+    // Crear los decants
+    const nuevosDecants = [];
+    for (let i = 0; i < cantidad_decants; i++) {
+      const nuevoDecant = await Decant.create({
+        perfume_id,
+        cantidad,
+        maleta_destino,
+      });
+      nuevosDecants.push(nuevoDecant);
+    }
 
-    perfume.remaining_ml -= cantidad;
+    // Restar la cantidad total del perfume
+    perfume.remaining_ml -= totalMlRequeridos;
     await perfume.save();
 
-    res.status(201).json(nuevoDecant);
+    res.status(201).json({
+      message: `✅ Se han agregado ${cantidad_decants} decants exitosamente.`,
+      decants: nuevosDecants,
+    });
   } catch (error) {
-    console.error('❌ Error al agregar decant:', error);
-    res.status(500).send('❌ Error al agregar decant');
+    console.error('❌ Error al agregar decants:', error);
+    res.status(500).send('❌ Error al agregar decants');
   }
 });
 
