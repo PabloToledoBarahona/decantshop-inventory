@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API_BASE_URL from "../config"; // Importar la URL base
+import API_BASE_URL from "../config";
 import axios from "axios";
 
 const InventorySummary = () => {
@@ -27,10 +27,18 @@ const InventorySummary = () => {
             decantResponse.data?.porMaleta?.find(
               (item) => item.maleta_destino === "Pablo"
             )?.totalDecantsPorMaleta || 0,
+          mlEnMaletaPablo:
+            decantResponse.data?.porMaleta?.find(
+              (item) => item.maleta_destino === "Pablo"
+            )?.totalMlPorMaleta || 0,
           decantsEnMaletaJoseCarlos:
             decantResponse.data?.porMaleta?.find(
               (item) => item.maleta_destino === "Jose Carlos"
             )?.totalDecantsPorMaleta || 0,
+          mlEnMaletaJoseCarlos:
+            decantResponse.data?.porMaleta?.find(
+              (item) => item.maleta_destino === "Jose Carlos"
+            )?.totalMlPorMaleta || 0,
         });
       }
     } catch (error) {
@@ -49,9 +57,7 @@ const InventorySummary = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-gray-800 rounded-lg shadow-md text-white">
-      <h2 className="text-2xl font-bold mb-6 text-center">
-        Resumen del Inventario
-      </h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Resumen del Inventario</h2>
 
       {/* Resumen de Perfumes */}
       <div className="mb-8">
@@ -69,6 +75,18 @@ const InventorySummary = () => {
               {perfumeSummary.totalMlRestantes} ml
             </p>
           </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Perfumes Disponibles</p>
+            <p className="text-2xl font-bold text-green-400">
+              {perfumeSummary.perfumesDisponibles}
+            </p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Perfumes No Disponibles</p>
+            <p className="text-2xl font-bold text-red-400">
+              {perfumeSummary.perfumesNoDisponibles}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -83,9 +101,21 @@ const InventorySummary = () => {
             </p>
           </div>
           <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Total de ML en Decants</p>
+            <p className="text-2xl font-bold text-green-400">
+              {decantSummary.totalMlEnDecants} ml
+            </p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
             <p className="font-semibold">Decants en Maleta Pablo</p>
             <p className="text-2xl font-bold text-blue-400">
               {decantSummary.decantsEnMaletaPablo}
+            </p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Decants en Maleta Jose Carlos</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {decantSummary.decantsEnMaletaJoseCarlos}
             </p>
           </div>
         </div>
