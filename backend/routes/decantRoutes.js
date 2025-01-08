@@ -3,18 +3,28 @@ const router = express.Router();
 const { Decant, Perfume } = require('../models'); // Importa los modelos
 const { Sequelize } = require('sequelize'); // Importar Sequelize para funciones agregadas
 
-// ✅ Obtener todos los decants
+// ✅ Obtener todos los decants con paginación
 router.get('/', async (req, res) => {
   try {
-    const decants = await Decant.findAll({
+    const { limit = 10, page = 1 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const decants = await Decant.findAndCountAll({
       include: [
         {
           model: Perfume,
-          as: 'perfume', // Asegúrate de que este alias coincida en el modelo
+          as: 'perfume',
         },
       ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
-    res.status(200).json(decants);
+
+    res.status(200).json({
+      total: decants.count,
+      pages: Math.ceil(decants.count / limit),
+      data: decants.rows,
+    });
   } catch (error) {
     console.error('❌ Error al obtener decants:', error);
     res.status(500).send('❌ Error al obtener decants');
@@ -41,7 +51,16 @@ router.get('/maleta/:maleta_destino', async (req, res) => {
       ],
     });
 
-    res.status(200).json(decants);
+    const totalDecants = await Decant.count({ where: { maleta_destino } });
+    const totalMl = await Decant.sum('cantidad', { where: { maleta_destino } });
+
+    res.status(200).json({
+      decants,
+      resumen: {
+        totalDecants,
+        totalMl,
+      },
+    });
   } catch (error) {
     console.error('❌ Error al obtener decants por maleta:', error);
     res.status(500).send('❌ Error al obtener decants por maleta');
@@ -53,7 +72,6 @@ router.post('/', async (req, res) => {
   try {
     const { perfume_id, cantidad, maleta_destino, cantidad_decants = 1 } = req.body;
 
-    // Validaciones de campos obligatorios
     if (!perfume_id || !cantidad || !maleta_destino) {
       return res.status(400).send('❌ Todos los campos son obligatorios.');
     }
@@ -77,7 +95,6 @@ router.post('/', async (req, res) => {
       return res.status(400).send('❌ No hay suficiente cantidad disponible para todos los decants.');
     }
 
-    // Crear los decants
     const nuevosDecants = [];
     for (let i = 0; i < cantidad_decants; i++) {
       const nuevoDecant = await Decant.create({
@@ -88,17 +105,47 @@ router.post('/', async (req, res) => {
       nuevosDecants.push(nuevoDecant);
     }
 
-    // Restar la cantidad total del perfume
     perfume.remaining_ml -= totalMlRequeridos;
     await perfume.save();
 
     res.status(201).json({
       message: `✅ Se han agregado ${cantidad_decants} decants exitosamente.`,
       decants: nuevosDecants,
+      createdAt: new Date(),
     });
   } catch (error) {
     console.error('❌ Error al agregar decants:', error);
     res.status(500).send('❌ Error al agregar decants');
+  }
+});
+
+// ✅ Eliminar un decant individual por ID
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || isNaN(id)) {
+      return res.status(400).send('❌ El ID del decant no es válido.');
+    }
+
+    const decant = await Decant.findByPk(id);
+
+    if (!decant) {
+      return res.status(404).send('❌ Decant no encontrado.');
+    }
+
+    const perfume = await Perfume.findByPk(decant.perfume_id);
+    if (perfume) {
+      perfume.remaining_ml += decant.cantidad;
+      await perfume.save();
+    }
+
+    await decant.destroy();
+
+    res.status(200).json({ message: `✅ Decant ID ${id} eliminado correctamente.` });
+  } catch (error) {
+    console.error('❌ Error al eliminar decant:', error);
+    res.status(500).send('❌ Error interno del servidor.');
   }
 });
 
@@ -107,40 +154,31 @@ router.delete('/batch', async (req, res) => {
   try {
     const { decant_ids } = req.body;
 
-    console.log('🔍 Parámetros recibidos para eliminar decants:', { decant_ids });
-
     if (!decant_ids || !Array.isArray(decant_ids) || decant_ids.length === 0) {
-      console.warn('⚠️ Parámetros inválidos para eliminación:', { decant_ids });
       return res.status(400).send('❌ Parámetros inválidos. Se espera un array de IDs de decants.');
     }
 
-    // Buscar los decants por ID
     const decants = await Decant.findAll({
-      where: { id: decant_ids }
+      where: { id: decant_ids },
     });
 
     if (decants.length === 0) {
-      console.warn('⚠️ No se encontraron decants para eliminar.');
       return res.status(404).send('❌ No se encontraron decants para eliminar.');
     }
 
-    // Actualizar el stock del perfume y eliminar cada decant
     for (const decant of decants) {
       const perfume = await Perfume.findByPk(decant.perfume_id);
       if (perfume) {
-        console.log(`🔄 Actualizando stock del perfume ${perfume.id} (+${decant.cantidad} ml)`);
         perfume.remaining_ml += decant.cantidad;
         await perfume.save();
-      } else {
-        console.warn(`⚠️ Perfume no encontrado para el decant ${decant.id}`);
       }
-
-      console.log(`🗑️ Eliminando decant ID: ${decant.id}`);
       await decant.destroy();
     }
 
-    console.log('✅ Eliminación de decants completada correctamente.');
-    res.status(200).json({ message: `✅ Se eliminaron ${decants.length} decants correctamente.` });
+    res.status(200).json({
+      message: `✅ Se eliminaron ${decants.length} decants correctamente.`,
+      deletedIds: decant_ids,
+    });
   } catch (error) {
     console.error('❌ Error al eliminar decants en batch:', error.message);
     res.status(500).send('❌ Error interno del servidor.');
@@ -150,25 +188,21 @@ router.delete('/batch', async (req, res) => {
 // ✅ Resumen de Decants
 router.get('/resumen', async (req, res) => {
   try {
-    const resumen = await Decant.findAll({
-      attributes: [
-        [Sequelize.fn('SUM', Sequelize.col('cantidad')), 'totalMlDecants'],
-        [Sequelize.fn('COUNT', Sequelize.col('id')), 'totalDecants'],
-      ],
-      raw: true,
-    });
+    const { maleta_destino } = req.query;
+    const whereClause = maleta_destino ? { maleta_destino } : {};
 
-    const porMaleta = await Decant.findAll({
+    const resumen = await Decant.findAll({
+      where: whereClause,
       attributes: [
         'maleta_destino',
-        [Sequelize.fn('SUM', Sequelize.col('cantidad')), 'totalMlPorMaleta'],
-        [Sequelize.fn('COUNT', Sequelize.col('id')), 'totalDecantsPorMaleta'],
+        [Sequelize.fn('SUM', Sequelize.col('cantidad')), 'totalMlDecants'],
+        [Sequelize.fn('COUNT', Sequelize.col('id')), 'totalDecants'],
       ],
       group: ['maleta_destino'],
       raw: true,
     });
 
-    res.status(200).json({ resumen, porMaleta });
+    res.status(200).json(resumen);
   } catch (error) {
     console.error('❌ Error al obtener resumen de decants:', error);
     res.status(500).send('❌ Error al obtener resumen de decants');
