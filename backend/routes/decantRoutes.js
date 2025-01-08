@@ -3,12 +3,26 @@ const router = express.Router();
 const { Decant, Perfume } = require('../models'); // Importa los modelos
 const { Sequelize } = require('sequelize'); // Importar Sequelize para funciones agregadas
 
-// ✅ Obtener todos los decants con paginación
+// ✅ Obtener todos los decants (con o sin paginación)
 router.get('/', async (req, res) => {
   try {
-    const { limit = 10, page = 1 } = req.query;
-    const offset = (page - 1) * limit;
+    const { all, limit = 10, page = 1 } = req.query;
 
+    if (all === 'true') {
+      // Sin paginación: Devuelve todos los decants
+      const decants = await Decant.findAll({
+        include: [
+          {
+            model: Perfume,
+            as: 'perfume',
+          },
+        ],
+      });
+      return res.status(200).json(decants);
+    }
+
+    // Con paginación: Devuelve un subconjunto de decants
+    const offset = (page - 1) * limit;
     const decants = await Decant.findAndCountAll({
       include: [
         {
