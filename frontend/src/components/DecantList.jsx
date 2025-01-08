@@ -18,10 +18,14 @@ const DecantList = () => {
   const fetchDecants = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/decants`);
-      setDecants(response.data || []);
+      const decantData = response.data.data || []; // Aseguramos que accedemos al array correcto
 
-      const grouped = response.data.reduce((acc, decant) => {
-        const key = `${decant.perfume?.name || "Perfume Desconocido"}-${decant.maleta_destino}`;
+      setDecants(decantData);
+
+      const grouped = decantData.reduce((acc, decant) => {
+        const key = `${decant.perfume?.name || "Perfume Desconocido"}-${
+          decant.maleta_destino
+        }`;
         if (!acc[key]) {
           acc[key] = {
             groupId: `${decant.perfume_id}-${decant.maleta_destino}`,
@@ -37,13 +41,18 @@ const DecantList = () => {
         acc[key].decants.push(decant);
         return acc;
       }, {});
+
       setGroupedDecants(Object.values(grouped));
 
       setUniquePerfumes(
-        Array.from(new Set(response.data.map((decant) => decant.perfume?.name))).filter(Boolean)
+        Array.from(
+          new Set(decantData.map((decant) => decant.perfume?.name))
+        ).filter(Boolean)
       );
       setUniqueMaletas(
-        Array.from(new Set(response.data.map((decant) => decant.maleta_destino))).filter(Boolean)
+        Array.from(
+          new Set(decantData.map((decant) => decant.maleta_destino))
+        ).filter(Boolean)
       );
     } catch (error) {
       console.error("Error al obtener decants:", error);
@@ -55,8 +64,10 @@ const DecantList = () => {
   }, []);
 
   // ✅ Filtros
-  const handlePerfumeFilterChange = (e) => setSelectedPerfumeFilter(e.target.value);
-  const handleMaletaFilterChange = (e) => setSelectedMaletaFilter(e.target.value);
+  const handlePerfumeFilterChange = (e) =>
+    setSelectedPerfumeFilter(e.target.value);
+  const handleMaletaFilterChange = (e) =>
+    setSelectedMaletaFilter(e.target.value);
   const handleVendedorFilterChange = (e) => setSelectedVendedor(e.target.value);
 
   // ✅ Mostrar modal para eliminar un decant
@@ -111,7 +122,9 @@ const DecantList = () => {
       <section className="bg-gray-50 p-4 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">Resumen por Perfume</h2>
         <div className="mb-4">
-          <label className="block mb-1 font-medium">Seleccionar Vendedor:</label>
+          <label className="block mb-1 font-medium">
+            Seleccionar Vendedor:
+          </label>
           <select
             value={selectedVendedor}
             onChange={handleVendedorFilterChange}
@@ -124,7 +137,10 @@ const DecantList = () => {
         </div>
         <ul>
           {resumenGrouped.map((group) => (
-            <li key={group.groupId} className="flex justify-between py-1 border-b">
+            <li
+              key={group.groupId}
+              className="flex justify-between py-1 border-b"
+            >
               <span>{group.name}</span>
               <span>
                 {group.cantidad} decants ({group.maleta})
@@ -139,7 +155,9 @@ const DecantList = () => {
         <h2 className="text-xl font-semibold mb-4">Filtros</h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 font-medium">Filtrar por Perfume:</label>
+            <label className="block mb-1 font-medium">
+              Filtrar por Perfume:
+            </label>
             <select
               value={selectedPerfumeFilter}
               onChange={handlePerfumeFilterChange}
@@ -154,7 +172,9 @@ const DecantList = () => {
             </select>
           </div>
           <div>
-            <label className="block mb-1 font-medium">Filtrar por Maleta:</label>
+            <label className="block mb-1 font-medium">
+              Filtrar por Maleta:
+            </label>
             <select
               value={selectedMaletaFilter}
               onChange={handleMaletaFilterChange}
@@ -176,10 +196,17 @@ const DecantList = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredGroupedDecants.map((group) =>
             group.decants.map((decant) => (
-              <div key={decant.id} className="p-4 bg-white border rounded-lg shadow-md relative">
+              <div
+                key={decant.id}
+                className="p-4 bg-white border rounded-lg shadow-md relative"
+              >
                 <h3 className="font-semibold">{group.name}</h3>
-                <p><strong>Maleta:</strong> {group.maleta}</p>
-                <p><strong>Cantidad:</strong> {decant.cantidad} ml</p>
+                <p>
+                  <strong>Maleta:</strong> {group.maleta}
+                </p>
+                <p>
+                  <strong>Cantidad:</strong> {decant.cantidad} ml
+                </p>
                 <button
                   onClick={() => handleDeleteDecant(decant)}
                   className="absolute top-2 right-2 text-red-500"
@@ -199,8 +226,18 @@ const DecantList = () => {
             <h3 className="text-xl font-bold mb-4">Eliminar Decant</h3>
             <p>¿Estás seguro de eliminar este decant?</p>
             <div className="flex justify-end mt-4 space-x-4">
-              <button onClick={handleConfirmDelete} className="bg-red-500 text-white px-4 py-2 rounded-md">Eliminar</button>
-              <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded-md">Cancelar</button>
+              <button
+                onClick={handleConfirmDelete}
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+              >
+                Eliminar
+              </button>
+              <button
+                onClick={closeModal}
+                className="bg-gray-300 px-4 py-2 rounded-md"
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
