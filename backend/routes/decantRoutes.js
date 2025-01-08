@@ -102,31 +102,48 @@ router.post('/', async (req, res) => {
   }
 });
 
-// ✅ Eliminar un Decant
-router.delete('/:id', async (req, res) => {
+// ✅ Eliminar varios decants por IDs específicos
+router.delete('/batch', async (req, res) => {
   try {
-    const { id } = req.params;
+    const { decant_ids } = req.body;
 
-    if (isNaN(id)) {
-      return res.status(400).send('❌ El ID debe ser un número válido.');
+    console.log('🔍 Parámetros recibidos para eliminar decants:', { decant_ids });
+
+    if (!decant_ids || !Array.isArray(decant_ids) || decant_ids.length === 0) {
+      console.warn('⚠️ Parámetros inválidos para eliminación:', { decant_ids });
+      return res.status(400).send('❌ Parámetros inválidos. Se espera un array de IDs de decants.');
     }
 
-    const decant = await Decant.findByPk(id);
-    if (!decant) {
-      return res.status(404).send('❌ Decant no encontrado.');
+    // Buscar los decants por ID
+    const decants = await Decant.findAll({
+      where: { id: decant_ids }
+    });
+
+    if (decants.length === 0) {
+      console.warn('⚠️ No se encontraron decants para eliminar.');
+      return res.status(404).send('❌ No se encontraron decants para eliminar.');
     }
 
-    const perfume = await Perfume.findByPk(decant.perfume_id);
-    if (perfume) {
-      perfume.remaining_ml += decant.cantidad;
-      await perfume.save();
+    // Actualizar el stock del perfume y eliminar cada decant
+    for (const decant of decants) {
+      const perfume = await Perfume.findByPk(decant.perfume_id);
+      if (perfume) {
+        console.log(`🔄 Actualizando stock del perfume ${perfume.id} (+${decant.cantidad} ml)`);
+        perfume.remaining_ml += decant.cantidad;
+        await perfume.save();
+      } else {
+        console.warn(`⚠️ Perfume no encontrado para el decant ${decant.id}`);
+      }
+
+      console.log(`🗑️ Eliminando decant ID: ${decant.id}`);
+      await decant.destroy();
     }
 
-    await decant.destroy();
-    res.status(204).send();
+    console.log('✅ Eliminación de decants completada correctamente.');
+    res.status(200).json({ message: `✅ Se eliminaron ${decants.length} decants correctamente.` });
   } catch (error) {
-    console.error('❌ Error al eliminar decant:', error);
-    res.status(500).send('❌ Error al eliminar decant');
+    console.error('❌ Error al eliminar decants en batch:', error.message);
+    res.status(500).send('❌ Error interno del servidor.');
   }
 });
 

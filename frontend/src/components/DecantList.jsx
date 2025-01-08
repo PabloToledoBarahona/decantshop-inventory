@@ -1,26 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import API_BASE_URL from '../config';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import API_BASE_URL from "../config";
+import { FaTrash } from "react-icons/fa";
 
 const DecantList = () => {
   const [decants, setDecants] = useState([]);
-  const [filterMaleta, setFilterMaleta] = useState(''); // Filtro de maleta
-  const [filterPerfume, setFilterPerfume] = useState(''); // Filtro de perfume
-  const [uniquePerfumes, setUniquePerfumes] = useState([]); // Lista de perfumes únicos
+  const [groupedDecants, setGroupedDecants] = useState([]);
+  const [uniquePerfumes, setUniquePerfumes] = useState([]);
+  const [uniqueMaletas, setUniqueMaletas] = useState([]);
+  const [selectedPerfumeFilter, setSelectedPerfumeFilter] = useState("");
+  const [selectedMaletaFilter, setSelectedMaletaFilter] = useState("");
+  const [selectedVendedor, setSelectedVendedor] = useState("");
+  const [selectedDecant, setSelectedDecant] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
-  // ✅ Obtener la lista de decants (con detalles del perfume)
+  // ✅ Obtener la lista de decants
   const fetchDecants = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/decants`);
       setDecants(response.data || []);
 
-      // Extraer nombres únicos de perfumes para los filtros
-      const perfumes = Array.from(
-        new Set(response.data.map((decant) => decant.perfume?.name))
-      ).filter(Boolean);
-      setUniquePerfumes(perfumes);
+      const grouped = response.data.reduce((acc, decant) => {
+        const key = `${decant.perfume?.name || "Perfume Desconocido"}-${decant.maleta_destino}`;
+        if (!acc[key]) {
+          acc[key] = {
+            groupId: `${decant.perfume_id}-${decant.maleta_destino}`,
+            name: decant.perfume?.name || "Perfume Desconocido",
+            maleta: decant.maleta_destino,
+            cantidad: 0,
+            contenido: 0,
+            decants: [],
+          };
+        }
+        acc[key].cantidad += 1;
+        acc[key].contenido += decant.cantidad;
+        acc[key].decants.push(decant);
+        return acc;
+      }, {});
+      setGroupedDecants(Object.values(grouped));
+
+      setUniquePerfumes(
+        Array.from(new Set(response.data.map((decant) => decant.perfume?.name))).filter(Boolean)
+      );
+      setUniqueMaletas(
+        Array.from(new Set(response.data.map((decant) => decant.maleta_destino))).filter(Boolean)
+      );
     } catch (error) {
-      console.error('❌ Error al obtener decants:', error);
+      console.error("Error al obtener decants:", error);
     }
   };
 
@@ -28,132 +54,155 @@ const DecantList = () => {
     fetchDecants();
   }, []);
 
-  // ✅ Manejar filtro por maleta
-  const handleFilterMaletaChange = (event) => {
-    setFilterMaleta(event.target.value);
+  // ✅ Filtros
+  const handlePerfumeFilterChange = (e) => setSelectedPerfumeFilter(e.target.value);
+  const handleMaletaFilterChange = (e) => setSelectedMaletaFilter(e.target.value);
+  const handleVendedorFilterChange = (e) => setSelectedVendedor(e.target.value);
+
+  // ✅ Mostrar modal para eliminar un decant
+  const handleDeleteDecant = (decant) => {
+    setSelectedDecant(decant);
+    setShowModal(true);
   };
 
-  // ✅ Manejar filtro por perfume
-  const handleFilterPerfumeChange = (event) => {
-    setFilterPerfume(event.target.value);
-  };
-
-  // ✅ Eliminar un decant
-  const handleDeleteDecant = async (id) => {
+  // ✅ Confirmar eliminación
+  const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`${API_BASE_URL}/decants/${id}`);
-      fetchDecants(); // Actualizar lista después de eliminar
+      if (!selectedDecant?.id) {
+        alert("❌ El ID del decant no es válido.");
+        return;
+      }
+
+      await axios.delete(`${API_BASE_URL}/decants/${selectedDecant.id}`, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      setShowModal(false);
+      fetchDecants();
+      alert("✅ Decant eliminado correctamente.");
     } catch (error) {
-      console.error('❌ Error al eliminar decant:', error);
+      console.error("❌ Error al eliminar decant:", error);
+      alert("Hubo un error al intentar eliminar el decant.");
     }
   };
 
-  // ✅ Aplicar filtros combinados
-  const filteredDecants = decants.filter((decant) => {
-    const matchesMaleta = filterMaleta
-      ? decant.maleta_destino === filterMaleta
-      : true;
-    const matchesPerfume = filterPerfume
-      ? decant.perfume?.name === filterPerfume
-      : true;
+  // ✅ Cerrar Modal
+  const closeModal = () => {
+    setSelectedDecant(null);
+    setShowModal(false);
+  };
 
-    return matchesMaleta && matchesPerfume;
+  // ✅ Filtrar decants agrupados
+  const filteredGroupedDecants = groupedDecants.filter((group) => {
+    return (
+      (selectedPerfumeFilter === "" || group.name === selectedPerfumeFilter) &&
+      (selectedMaletaFilter === "" || group.maleta === selectedMaletaFilter)
+    );
   });
 
-  // ✅ Agrupar decants por perfume
-  const groupedDecants = filteredDecants.reduce((acc, decant) => {
-    const perfumeName = decant.perfume?.name || 'Perfume Desconocido';
-    if (!acc[perfumeName]) {
-      acc[perfumeName] = {
-        id: decant.id,
-        name: perfumeName,
-        maleta: decant.maleta_destino,
-        cantidad: 1,
-        contenido: decant.cantidad,
-      };
-    } else {
-      acc[perfumeName].cantidad += 1;
-      acc[perfumeName].contenido += decant.cantidad;
-    }
-    return acc;
-  }, {});
+  // ✅ Filtrar Resumen por Vendedor
+  const resumenGrouped = groupedDecants.filter((group) => {
+    return selectedVendedor === "" || group.maleta === selectedVendedor;
+  });
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gray-800 text-white rounded-lg shadow-md">
-      <header className="mb-6">
-        <h2 className="text-3xl font-bold mb-2 text-center">Lista de Decants</h2>
-        <p className="text-gray-400 text-center">
-          Administra los decants y filtra por maletas y perfumes según tus necesidades.
-        </p>
-      </header>
-
-      {/* 🛠️ Filtros */}
-      <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Filtro por Maleta */}
-        <div>
-          <label className="text-gray-400 font-medium block mb-1">Filtrar por maleta:</label>
+    <div className="p-6 max-w-7xl mx-auto bg-white text-black rounded-lg shadow-md space-y-6">
+      {/* ✅ Resumen por Perfume */}
+      <section className="bg-gray-50 p-4 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Resumen por Perfume</h2>
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Seleccionar Vendedor:</label>
           <select
-            value={filterMaleta}
-            onChange={handleFilterMaletaChange}
-            className="w-full p-2 border rounded-lg text-black"
+            value={selectedVendedor}
+            onChange={handleVendedorFilterChange}
+            className="w-full p-2 rounded-md border"
           >
-            <option value="">Todas</option>
+            <option value="">Todos</option>
             <option value="Pablo">Pablo</option>
             <option value="Jose Carlos">Jose Carlos</option>
           </select>
         </div>
+        <ul>
+          {resumenGrouped.map((group) => (
+            <li key={group.groupId} className="flex justify-between py-1 border-b">
+              <span>{group.name}</span>
+              <span>
+                {group.cantidad} decants ({group.maleta})
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {/* Filtro por Perfume */}
-        <div>
-          <label className="text-gray-400 font-medium block mb-1">Filtrar por perfume:</label>
-          <select
-            value={filterPerfume}
-            onChange={handleFilterPerfumeChange}
-            className="w-full p-2 border rounded-lg text-black"
-          >
-            <option value="">Todos</option>
-            {uniquePerfumes.map((perfume, index) => (
-              <option key={index} value={perfume}>
-                {perfume}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* 📝 Lista de Decants Agrupados */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.values(groupedDecants).map((decant) => (
-          <div
-            key={decant.id}
-            className="p-4 bg-white text-black rounded-lg shadow-md hover:shadow-lg transition-shadow"
-          >
-            <h3 className="text-xl font-semibold mb-2">{decant.name}</h3>
-            <div className="text-sm">
-              <p>
-                <span className="font-medium">Cantidad:</span> {decant.cantidad}
-              </p>
-              <p>
-                <span className="font-medium">Contenido:</span> {decant.contenido} ml
-              </p>
-              <p>
-                <span className="font-medium">Maleta:</span> {decant.maleta}
-              </p>
-            </div>
-            <button
-              onClick={() => handleDeleteDecant(decant.id)}
-              className="mt-4 w-full bg-red-500 text-white font-medium p-2 rounded-lg hover:bg-red-600"
+      {/* ✅ Filtros */}
+      <section className="bg-gray-100 p-4 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold mb-4">Filtros</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block mb-1 font-medium">Filtrar por Perfume:</label>
+            <select
+              value={selectedPerfumeFilter}
+              onChange={handlePerfumeFilterChange}
+              className="w-full p-2 rounded-md border"
             >
-              Eliminar
-            </button>
+              <option value="">Todos</option>
+              {uniquePerfumes.map((perfume) => (
+                <option key={perfume} value={perfume}>
+                  {perfume}
+                </option>
+              ))}
+            </select>
           </div>
-        ))}
-      </div>
+          <div>
+            <label className="block mb-1 font-medium">Filtrar por Maleta:</label>
+            <select
+              value={selectedMaletaFilter}
+              onChange={handleMaletaFilterChange}
+              className="w-full p-2 rounded-md border"
+            >
+              <option value="">Todas</option>
+              {uniqueMaletas.map((maleta) => (
+                <option key={maleta} value={maleta}>
+                  {maleta}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </section>
 
-      {/* Sin Resultados */}
-      {Object.keys(groupedDecants).length === 0 && (
-        <div className="mt-6 text-center text-gray-400">
-          <p>No se encontraron decants con los filtros seleccionados.</p>
+      {/* ✅ Cards */}
+      <section>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredGroupedDecants.map((group) =>
+            group.decants.map((decant) => (
+              <div key={decant.id} className="p-4 bg-white border rounded-lg shadow-md relative">
+                <h3 className="font-semibold">{group.name}</h3>
+                <p><strong>Maleta:</strong> {group.maleta}</p>
+                <p><strong>Cantidad:</strong> {decant.cantidad} ml</p>
+                <button
+                  onClick={() => handleDeleteDecant(decant)}
+                  className="absolute top-2 right-2 text-red-500"
+                >
+                  <FaTrash />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* ✅ Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h3 className="text-xl font-bold mb-4">Eliminar Decant</h3>
+            <p>¿Estás seguro de eliminar este decant?</p>
+            <div className="flex justify-end mt-4 space-x-4">
+              <button onClick={handleConfirmDelete} className="bg-red-500 text-white px-4 py-2 rounded-md">Eliminar</button>
+              <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded-md">Cancelar</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
