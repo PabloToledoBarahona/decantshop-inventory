@@ -15,6 +15,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'vendedor_id',
         as: 'vendedor',
       });
+
+      // Relación ventasDecants
+      Venta.belongsToMany(models.Decant, {
+        through: 'VentasDecants',
+        foreignKey: 'venta_id',
+        otherKey: 'decant_id',
+        as: 'decants',
+      });
     }
   }
 

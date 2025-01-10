@@ -21,6 +21,32 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ✅ Obtener un decant por ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Buscar el decant por su ID
+    const decant = await Decant.findByPk(id, {
+      include: [
+        {
+          model: Perfume,
+          as: 'associatedPerfume', // Alias definido en el modelo
+        },
+      ],
+    });
+
+    if (!decant) {
+      return res.status(404).send('❌ Decant no encontrado.');
+    }
+
+    res.status(200).json(decant);
+  } catch (error) {
+    console.error('❌ Error al obtener el decant por ID:', error);
+    res.status(500).send('❌ Error interno del servidor.');
+  }
+});
+
 // ✅ Obtener Decants por Maleta
 router.get('/maleta/:maleta_destino', async (req, res) => {
   try {
