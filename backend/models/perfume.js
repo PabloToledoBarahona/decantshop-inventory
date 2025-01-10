@@ -14,6 +14,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'perfume_id',
         as: 'decants', // Alias para la relación
       });
+
+      // Relación: Perfume pertenece a un Proveedor
+      Perfume.belongsTo(models.Proveedor, {
+        foreignKey: 'proveedor_id',
+        as: 'proveedor', // Alias para la relación
+      });
     }
   }
 
