@@ -4,7 +4,6 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Cliente extends Model {
     static associate(models) {
-      // Asociaciones futuras (ejemplo: Cliente tiene muchas Ventas)
       Cliente.hasMany(models.Venta, {
         foreignKey: 'cliente_id',
         as: 'ventas',
@@ -14,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Cliente.init(
     {
-      nombre: {
+      nombre_completo: { // Ajustar al nombre correcto
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -22,14 +21,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          is: /^[0-9]{8,15}$/, // Validar formato numérico y longitud razonable
+          is: /^[0-9]{8,15}$/, // Validar formato
         },
       },
       correo: {
         type: DataTypes.STRING,
         allowNull: true,
         validate: {
-          isEmail: true, // Validar formato de correo
+          isEmail: true,
         },
       },
     },

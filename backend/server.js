@@ -5,6 +5,7 @@ const perfumeRoutes = require('./routes/perfumeRoutes'); // ✅ Ruta relativa pa
 const decantRoutes = require('./routes/decantRoutes');
 const transferRoutes = require('./routes/transferRoutes');
 const proveedoresRoutes = require('./routes/proveedoresRoutes'); // ✅ Importar rutas de proveedores
+const clientesRoutes = require('./routes/clientesRoutes'); // ✅ Importar rutas de clientes
 require('dotenv').config();
 
 const app = express();
@@ -26,6 +27,7 @@ app.use('/api/perfumes', perfumeRoutes);
 app.use('/api/decants', decantRoutes);
 app.use('/api/transfers', transferRoutes);
 app.use('/api/proveedores', proveedoresRoutes); // ✅ Ruta para proveedores
+app.use('/api/clientes', clientesRoutes); // ✅ Registrar rutas
 
 // ✅ Prueba de conexión a la base de datos
 app.get('/ping-db', async (req, res) => {
