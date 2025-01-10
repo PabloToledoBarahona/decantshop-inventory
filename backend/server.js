@@ -4,6 +4,7 @@ const db = require('./models'); // ✅ Ruta relativa para modelos
 const perfumeRoutes = require('./routes/perfumeRoutes'); // ✅ Ruta relativa para rutas
 const decantRoutes = require('./routes/decantRoutes');
 const transferRoutes = require('./routes/transferRoutes');
+const proveedoresRoutes = require('./routes/proveedoresRoutes'); // ✅ Importar rutas de proveedores
 require('dotenv').config();
 
 const app = express();
@@ -24,6 +25,7 @@ const PORT = process.env.PORT || 8080;
 app.use('/api/perfumes', perfumeRoutes);
 app.use('/api/decants', decantRoutes);
 app.use('/api/transfers', transferRoutes);
+app.use('/api/proveedores', proveedoresRoutes); // ✅ Ruta para proveedores
 
 // ✅ Prueba de conexión a la base de datos
 app.get('/ping-db', async (req, res) => {
@@ -97,4 +99,15 @@ app._router.stack.forEach((middleware) => {
       }
     });
   }
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      console.log(`Ruta registrada: ${middleware.route.path}`);
+    } else if (middleware.name === 'router') {
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          console.log(`Ruta registrada: ${handler.route.path}`);
+        }
+      });
+    }
+  });
 });
