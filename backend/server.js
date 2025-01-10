@@ -1,11 +1,12 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./models'); // ✅ Ruta relativa para modelos
-const perfumeRoutes = require('./routes/perfumeRoutes'); // ✅ Ruta relativa para rutas
+const db = require('./models');
+const perfumeRoutes = require('./routes/perfumeRoutes');
 const decantRoutes = require('./routes/decantRoutes');
 const transferRoutes = require('./routes/transferRoutes');
-const proveedoresRoutes = require('./routes/proveedoresRoutes'); // ✅ Importar rutas de proveedores
-const clientesRoutes = require('./routes/clientesRoutes'); // ✅ Importar rutas de clientes
+const proveedoresRoutes = require('./routes/proveedoresRoutes'); 
+const clientesRoutes = require('./routes/clientesRoutes'); 
+const vendedoresRoutes = require('./routes/vendedoresRoutes'); 
 require('dotenv').config();
 
 const app = express();
@@ -26,8 +27,9 @@ const PORT = process.env.PORT || 8080;
 app.use('/api/perfumes', perfumeRoutes);
 app.use('/api/decants', decantRoutes);
 app.use('/api/transfers', transferRoutes);
-app.use('/api/proveedores', proveedoresRoutes); // ✅ Ruta para proveedores
-app.use('/api/clientes', clientesRoutes); // ✅ Registrar rutas
+app.use('/api/proveedores', proveedoresRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/vendedores', vendedoresRoutes);
 
 // ✅ Prueba de conexión a la base de datos
 app.get('/ping-db', async (req, res) => {
