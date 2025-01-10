@@ -36,9 +36,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT,
         allowNull: false,
       },
+      monto_pagado: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0, // Inicialmente no se ha pagado nada
+      },
+      saldo: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0, // Se calculará automáticamente
+      },
       estado: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          isIn: [['vendido', 'deuda']],
+        },
       },
       detalles: {
         type: DataTypes.TEXT,
@@ -52,6 +65,12 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+  
+  // Hook para calcular el saldo y actualizar el estado automáticamente
+  Venta.beforeSave((venta) => {
+    venta.saldo = venta.monto_total - venta.monto_pagado;
+    venta.estado = venta.saldo === 0 ? 'vendido' : 'deuda';
+  });
 
   return Venta;
 };

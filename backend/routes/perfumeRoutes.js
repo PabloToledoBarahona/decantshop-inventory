@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Perfume } = require('../models'); // Importa el modelo Perfume
+const { Perfume, Proveedor } = require('../models'); // Importa los modelos necesarios
 
 /** ✅ RUTAS ESPECÍFICAS (Primero las rutas más específicas para evitar colisiones) **/
 
@@ -36,11 +36,17 @@ router.get('/resumen', async (req, res) => {
 // 🧴 Obtener todos los perfumes
 router.get('/', async (req, res) => {
   try {
-    const perfumes = await Perfume.findAll();
+    const perfumes = await Perfume.findAll({
+      include: {
+        model: Proveedor,
+        as: 'proveedor',
+        attributes: ['id', 'nombre_proveedor', 'numero_contacto'], // Atributos del proveedor
+      },
+    });
     res.status(200).json(perfumes);
   } catch (error) {
-    console.error('❌ Error al obtener perfumes:', error);
-    res.status(500).send('❌ Error al obtener perfumes');
+    console.error('Error al obtener perfumes:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
   }
 });
 
@@ -53,7 +59,14 @@ router.get('/:id', async (req, res) => {
       return res.status(400).send('❌ El ID debe ser un número válido.');
     }
 
-    const perfume = await Perfume.findByPk(id);
+    const perfume = await Perfume.findByPk(id, {
+      include: {
+        model: Proveedor,
+        as: 'proveedor',
+        attributes: ['id', 'nombre_proveedor', 'numero_contacto'], // Atributos del proveedor
+      },
+    });
+
     if (perfume) {
       res.status(200).json(perfume);
     } else {
@@ -68,9 +81,9 @@ router.get('/:id', async (req, res) => {
 // 🧴 Agregar un nuevo perfume
 router.post('/', async (req, res) => {
   try {
-    const { name, total_ml, remaining_ml, status } = req.body;
+    const { name, total_ml, remaining_ml, status, proveedor_id } = req.body;
 
-    if (!name || !total_ml || !remaining_ml || !status) {
+    if (!name || !total_ml || !remaining_ml || !status || !proveedor_id) {
       return res.status(400).send('❌ Todos los campos son obligatorios.');
     }
 
@@ -78,11 +91,17 @@ router.post('/', async (req, res) => {
       return res.status(400).send('❌ Los valores de ML deben ser números válidos y positivos.');
     }
 
+    const proveedor = await Proveedor.findByPk(proveedor_id);
+    if (!proveedor) {
+      return res.status(404).send('❌ Proveedor no encontrado.');
+    }
+
     const nuevoPerfume = await Perfume.create({
       name,
       total_ml,
       remaining_ml,
       status,
+      proveedor_id,
     });
     res.status(201).json(nuevoPerfume);
   } catch (error) {
@@ -95,13 +114,13 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, total_ml, remaining_ml, status } = req.body;
+    const { name, total_ml, remaining_ml, status, proveedor_id } = req.body;
 
     if (isNaN(id)) {
       return res.status(400).send('❌ El ID debe ser un número válido.');
     }
 
-    if (!name || !total_ml || !remaining_ml || !status) {
+    if (!name || !total_ml || !remaining_ml || !status || !proveedor_id) {
       return res.status(400).send('❌ Todos los campos son obligatorios.');
     }
 
@@ -112,7 +131,12 @@ router.put('/:id', async (req, res) => {
     const perfume = await Perfume.findByPk(id);
 
     if (perfume) {
-      await perfume.update({ name, total_ml, remaining_ml, status });
+      const proveedor = await Proveedor.findByPk(proveedor_id);
+      if (!proveedor) {
+        return res.status(404).send('❌ Proveedor no encontrado.');
+      }
+
+      await perfume.update({ name, total_ml, remaining_ml, status, proveedor_id });
       res.status(200).json(perfume);
     } else {
       res.status(404).send('❌ Perfume no encontrado.');

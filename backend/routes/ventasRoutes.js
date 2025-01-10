@@ -108,6 +108,30 @@ router.get('/:id', async (req, res) => {
   });
 
 
+  // Actualizar pagos y estado de una venta
+  router.put('/:id', async (req, res) => {
+    try {
+      const { monto_pagado } = req.body;
+      const venta = await Venta.findByPk(req.params.id);
+  
+      if (!venta) {
+        return res.status(404).json({ error: 'Venta no encontrada.' });
+      }
+  
+      if (monto_pagado < 0 || monto_pagado > venta.monto_total) {
+        return res.status(400).json({ error: 'El monto pagado no es válido.' });
+      }
+  
+      venta.monto_pagado = monto_pagado;
+      await venta.save(); // El hook actualizará el saldo y el estado automáticamente
+  
+      res.status(200).json(venta);
+    } catch (error) {
+      console.error('Error al actualizar venta:', error);
+      res.status(500).json({ error: 'Error interno del servidor.' });
+    }
+  });
+
 
   //eliminar una venta
   router.delete('/:id', async (req, res) => {

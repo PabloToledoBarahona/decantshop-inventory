@@ -34,22 +34,24 @@ module.exports = (sequelize, DataTypes) => {
       total_ml: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-          min: 0, // Validar que no sea negativo
-        },
       },
       remaining_ml: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-          min: 0,
-        },
       },
       status: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isIn: [['nuevo', 'parcial', 'vendido']], // Solo permite estos valores
+          isIn: [['nuevo', 'parcial', 'vendido']],
+        },
+      },
+      proveedor_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false, // Opcional al inicio
+        references: {
+          model: 'Proveedores',
+          key: 'id',
         },
       },
     },
