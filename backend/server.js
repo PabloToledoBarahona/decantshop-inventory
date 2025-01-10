@@ -99,15 +99,4 @@ app._router.stack.forEach((middleware) => {
       }
     });
   }
-  app._router.stack.forEach((middleware) => {
-    if (middleware.route) {
-      console.log(`Ruta registrada: ${middleware.route.path}`);
-    } else if (middleware.name === 'router') {
-      middleware.handle.stack.forEach((handler) => {
-        if (handler.route) {
-          console.log(`Ruta registrada: ${handler.route.path}`);
-        }
-      });
-    }
-  });
 });

@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Proveedor.init(
     {
-      nombre: {
+      nombre_proveedor: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -26,8 +26,8 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          is: /^[0-9]{8,15}$/, // Validar formato numérico y longitud razonable
-          notEmpty: true, // Evitar valores vacíos
+          is: /^[0-9]{8,15}$/,
+          notEmpty: true,
         },
       },
     },
@@ -35,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: 'Proveedor',
       tableName: 'Proveedores',
-      timestamps: true, // Activa createdAt y updatedAt
+      timestamps: true,
     }
   );
 
