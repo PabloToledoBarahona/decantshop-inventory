@@ -7,6 +7,7 @@ const transferRoutes = require('./routes/transferRoutes');
 const proveedoresRoutes = require('./routes/proveedoresRoutes'); 
 const clientesRoutes = require('./routes/clientesRoutes'); 
 const vendedoresRoutes = require('./routes/vendedoresRoutes'); 
+const ventasRoutes = require('./routes/ventasRoutes');
 require('dotenv').config();
 
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/transfers', transferRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
+app.use('/api/ventas', ventasRoutes);
 
 // ✅ Prueba de conexión a la base de datos
 app.get('/ping-db', async (req, res) => {

@@ -9,6 +9,12 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'cliente_id',
         as: 'cliente',
       });
+
+      // Relación: Venta pertenece a un Vendedor
+      Venta.belongsTo(models.Vendedor, {
+        foreignKey: 'vendedor_id',
+        as: 'vendedor',
+      });
     }
   }
 
