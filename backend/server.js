@@ -8,6 +8,7 @@ const proveedoresRoutes = require('./routes/proveedoresRoutes');
 const clientesRoutes = require('./routes/clientesRoutes'); 
 const vendedoresRoutes = require('./routes/vendedoresRoutes'); 
 const ventasRoutes = require('./routes/ventasRoutes');
+
 require('dotenv').config();
 
 const app = express();
@@ -106,3 +107,11 @@ app._router.stack.forEach((middleware) => {
     });
   }
 });
+
+db.sequelize.sync({ force: false }) // Asegúrate de no usar { force: true } en producción
+  .then(() => {
+    console.log('✅ Tablas sincronizadas correctamente.');
+  })
+  .catch((error) => {
+    console.error('❌ Error al sincronizar las tablas:', error);
+  });
