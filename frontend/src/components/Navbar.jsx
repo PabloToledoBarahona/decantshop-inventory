@@ -1,34 +1,36 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Importa Link de react-router-dom
-import {
-  FiMenu,
-  FiX,
-  FiList,
-  FiPlusCircle,
-  FiPackage,
-  FiUserPlus,
-  FiShuffle,
-  FiShoppingCart,
-  FiUsers,
-} from 'react-icons/fi';
+import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus, FiShuffle, FiShoppingCart, FiUsers } from 'react-icons/fi';
 
-const Navbar = () => {
+const Navbar = ({ setCurrentPage }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const toggleSection = (section) =>
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleNavigation = (page) => {
+    setCurrentPage(page);
+    setIsSidebarOpen(false); // Cierra la sidebar al seleccionar una opción
+  };
+
+  const toggleSection = (section) => {
     setActiveSection(activeSection === section ? '' : section);
+  };
 
   return (
     <div className="flex h-screen">
+      {/* Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full bg-gray-800 text-white shadow-lg transition-transform transform ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 lg:w-64`}
       >
-        <button className="text-white text-3xl lg:hidden p-4" onClick={toggleSidebar}>
-          <FiX />
+        <button
+          className="text-white text-3xl lg:hidden p-4"
+          onClick={toggleSidebar}
+        >
+          {isSidebarOpen ? <FiX /> : <FiMenu />}
         </button>
         <div className="p-4 text-2xl font-bold tracking-wide">DecantShop</div>
         <ul className="space-y-4">
@@ -44,29 +46,44 @@ const Navbar = () => {
             {activeSection === 'inventory' && (
               <ul className="space-y-2 pl-8">
                 <li>
-                  <Link to="/list" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('list')}
+                    className="hover:underline"
+                  >
                     Lista de Perfumes
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/decants" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('decants')}
+                    className="hover:underline"
+                  >
                     Lista de Decants
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/add" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('add')}
+                    className="hover:underline"
+                  >
                     Agregar Perfume
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/addDecant" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('addDecant')}
+                    className="hover:underline"
+                  >
                     Agregar Decant
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/transfers" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('transfers')}
+                    className="hover:underline"
+                  >
                     Transferencias
-                  </Link>
+                  </button>
                 </li>
               </ul>
             )}
@@ -84,24 +101,36 @@ const Navbar = () => {
             {activeSection === 'sales' && (
               <ul className="space-y-2 pl-8">
                 <li>
-                  <Link to="/ventas" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('ventas')}
+                    className="hover:underline"
+                  >
                     Lista de Ventas
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/clientes" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('clientes')}
+                    className="hover:underline"
+                  >
                     Clientes
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/vendedores" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('vendedores')}
+                    className="hover:underline"
+                  >
                     Vendedores
-                  </Link>
+                  </button>
                 </li>
                 <li>
-                  <Link to="/proveedores" className="hover:underline">
+                  <button
+                    onClick={() => handleNavigation('proveedores')}
+                    className="hover:underline"
+                  >
                     Proveedores
-                  </Link>
+                  </button>
                 </li>
               </ul>
             )}
@@ -109,9 +138,8 @@ const Navbar = () => {
         </ul>
       </div>
 
-      <button className="fixed top-4 left-4 text-white text-3xl lg:hidden z-50" onClick={toggleSidebar}>
-        <FiMenu />
-      </button>
+      {/* Contenido principal */}
+      <div className="flex-1 p-8 ml-64">{/* Aquí se renderizan las páginas */}</div>
     </div>
   );
 };

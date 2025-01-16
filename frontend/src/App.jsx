@@ -1,5 +1,4 @@
-import React from 'react';
-import { Routes, Route } from 'react-router-dom'; // Importa Routes y Route
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import PerfumeList from './components/PerfumeList';
 import AddPerfumeForm from './components/AddPerfumeForm';
@@ -13,27 +12,32 @@ import SellersList from './components/ventas/SellersList';
 import SuppliersList from './components/ventas/SuppliersList';
 
 const App = () => {
+  const [currentPage, setCurrentPage] = useState('home'); // Página inicial
+
+  // Función para actualizar perfumes si es necesario
+  const refreshPerfumes = () => {
+    console.log('Perfumes actualizados');
+  };
+
   return (
     <div className="flex">
-      <Navbar />
-      <div className="flex-1 p-6">
-        <Routes>
-          {/* Inventario */}
-          <Route path="/" element={<InventorySummary />} />
-          <Route path="/list" element={<PerfumeList />} />
-          <Route path="/add" element={<AddPerfumeForm />} />
-          <Route path="/decants" element={<DecantList />} />
-          <Route path="/addDecant" element={<AddDecantForm />} />
-          <Route path="/transfers" element={<TransferList />} />
+  <Navbar setCurrentPage={setCurrentPage} refreshPerfumes={refreshPerfumes} />
+  <div className="flex-1 p-6">
+    {/* Inventario */}
+    {currentPage === 'home' && <InventorySummary />}
+    {currentPage === 'list' && <PerfumeList />}
+    {currentPage === 'add' && <AddPerfumeForm />}
+    {currentPage === 'decants' && <DecantList />}
+    {currentPage === 'addDecant' && <AddDecantForm onAdd={() => setCurrentPage('decants')} />}
+    {currentPage === 'transfers' && <TransferList />}
 
-          {/* Ventas */}
-          <Route path="/ventas" element={<SalesList />} />
-          <Route path="/clientes" element={<ClientsList />} />
-          <Route path="/vendedores" element={<SellersList />} />
-          <Route path="/proveedores" element={<SuppliersList />} />
-        </Routes>
-      </div>
-    </div>
+    {/* Ventas */}
+    {currentPage === 'ventas' && <SalesList />}
+    {currentPage === 'clientes' && <ClientsList />}
+    {currentPage === 'vendedores' && <SellersList />}
+    {currentPage === 'proveedores' && <SuppliersList />}
+  </div>
+</div>
   );
 };
 
