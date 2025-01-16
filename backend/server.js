@@ -4,9 +4,9 @@ const db = require('./models');
 const perfumeRoutes = require('./routes/perfumeRoutes');
 const decantRoutes = require('./routes/decantRoutes');
 const transferRoutes = require('./routes/transferRoutes');
-const proveedoresRoutes = require('./routes/proveedoresRoutes'); 
 const clientesRoutes = require('./routes/clientesRoutes'); 
 const vendedoresRoutes = require('./routes/vendedoresRoutes'); 
+const proveedoresRoutes = require('./routes/proveedoresRoutes'); 
 const ventasRoutes = require('./routes/ventasRoutes');
 
 require('dotenv').config();
@@ -29,9 +29,9 @@ const PORT = process.env.PORT || 8080;
 app.use('/api/perfumes', perfumeRoutes);
 app.use('/api/decants', decantRoutes);
 app.use('/api/transfers', transferRoutes);
-app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
+app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/ventas', ventasRoutes);
 
 // ✅ Prueba de conexión a la base de datos
