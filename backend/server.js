@@ -115,3 +115,15 @@ db.sequelize.sync({ force: false }) // Asegúrate de no usar { force: true } en 
   .catch((error) => {
     console.error('❌ Error al sincronizar las tablas:', error);
   });
+
+  app._router.stack.forEach((middleware) => {
+    if (middleware.route) {
+      console.log(`Ruta: ${middleware.route.path}`);
+    } else if (middleware.name === 'router') {
+      middleware.handle.stack.forEach((handler) => {
+        if (handler.route) {
+          console.log(`Ruta: ${handler.route.path}`);
+        }
+      });
+    }
+  });
