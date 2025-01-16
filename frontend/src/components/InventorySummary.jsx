@@ -5,6 +5,7 @@ import axios from "axios";
 const InventorySummary = () => {
   const [perfumeSummary, setPerfumeSummary] = useState(null);
   const [decantSummary, setDecantSummary] = useState(null);
+  const [transferSummary, setTransferSummary] = useState(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -41,6 +42,10 @@ const InventorySummary = () => {
             )?.totalMlPorMaleta || 0,
         });
       }
+
+      // ✅ Fetch resumen de transferencias
+      const transferResponse = await axios.get(`${API_BASE_URL}/transfers/stats`);
+      setTransferSummary(transferResponse.data || {});
     } catch (error) {
       console.error("❌ Error al obtener los resúmenes:", error.response?.data || error.message);
       setError("No se pudieron obtener los resúmenes.");
@@ -51,7 +56,7 @@ const InventorySummary = () => {
     return <p className="text-red-500 text-center">{error}</p>;
   }
 
-  if (!perfumeSummary || !decantSummary) {
+  if (!perfumeSummary || !decantSummary || !transferSummary) {
     return <p className="text-gray-500 text-center">Cargando resúmenes...</p>;
   }
 
@@ -91,7 +96,7 @@ const InventorySummary = () => {
       </div>
 
       {/* Resumen de Decants */}
-      <div>
+      <div className="mb-8">
         <h3 className="text-xl font-semibold mb-4">Resumen de Decants</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-700 p-4 rounded-lg shadow">
@@ -116,6 +121,37 @@ const InventorySummary = () => {
             <p className="font-semibold">Decants en Maleta Jose Carlos</p>
             <p className="text-2xl font-bold text-blue-400">
               {decantSummary.decantsEnMaletaJoseCarlos}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Resumen de Transferencias */}
+      <div>
+        <h3 className="text-xl font-semibold mb-4">Resumen de Transferencias</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Total de Transferencias</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {transferSummary.totalTransfers}
+            </p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Transferencias desde Pablo</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {transferSummary.fromPablo}
+            </p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Transferencias desde Jose Carlos</p>
+            <p className="text-2xl font-bold text-blue-400">
+              {transferSummary.fromJoseCarlos}
+            </p>
+          </div>
+          <div className="bg-gray-700 p-4 rounded-lg shadow">
+            <p className="font-semibold">Última Transferencia</p>
+            <p className="text-2xl font-bold text-green-400">
+              {transferSummary.lastTransferDate || "No disponible"}
             </p>
           </div>
         </div>

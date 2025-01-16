@@ -8,6 +8,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'perfume_id',
         as: 'associatedPerfume', // Alias único para evitar conflictos
       });
+
+      Decant.belongsToMany(models.Venta, {
+        through: 'VentasDecants',
+        foreignKey: 'decant_id',
+        otherKey: 'venta_id',
+        as: 'ventas',
+      });
     }
   }
 

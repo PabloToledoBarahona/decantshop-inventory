@@ -1,91 +1,146 @@
 import React, { useState } from 'react';
-import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus, FiShuffle } from 'react-icons/fi';
+import { FiMenu, FiX, FiList, FiPlusCircle, FiPackage, FiUserPlus, FiShuffle, FiShoppingCart, FiUsers } from 'react-icons/fi';
 
 const Navbar = ({ setCurrentPage }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleNavigation = (page) => {
     setCurrentPage(page);
-    setIsMenuOpen(false); // Cierra el menú al seleccionar una opción
+    setIsSidebarOpen(false); // Cierra la sidebar al seleccionar una opción
+  };
+
+  const toggleSection = (section) => {
+    setActiveSection(activeSection === section ? '' : section);
   };
 
   return (
-    <nav className="bg-gray-800 p-4 shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto flex justify-between items-center">
-        {/* Logo */}
-        <div
-          onClick={() => handleNavigation('home')}
-          className="text-white text-2xl font-semibold tracking-wide hover:text-gray-400 transition-all duration-300 cursor-pointer"
-        >
-          DecantShop
-        </div>
-
-        {/* Botón hamburguesa */}
+    <div className="flex h-screen">
+      {/* Sidebar */}
+      <div
+        className={`fixed top-0 left-0 h-full bg-gray-800 text-white shadow-lg transition-transform transform ${
+          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 lg:w-64`}
+      >
         <button
-          className="text-white text-3xl lg:hidden focus:outline-none"
-          onClick={toggleMenu}
+          className="text-white text-3xl lg:hidden p-4"
+          onClick={toggleSidebar}
         >
-          {isMenuOpen ? <FiX /> : <FiMenu />}
+          {isSidebarOpen ? <FiX /> : <FiMenu />}
         </button>
-
-        {/* Menú de navegación */}
-        <ul
-          className={`lg:flex lg:space-x-8 text-gray-300 text-lg lg:static absolute top-full left-0 w-full bg-gray-800 lg:bg-transparent lg:w-auto ${
-            isMenuOpen ? 'block' : 'hidden'
-          }`}
-        >
+        <div className="p-4 text-2xl font-bold tracking-wide">DecantShop</div>
+        <ul className="space-y-4">
+          {/* Inventario */}
           <li>
             <button
-              onClick={() => handleNavigation('list')}
-              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
-            >
-              <FiList />
-              Perfumes
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => handleNavigation('decants')}
-              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-700"
+              onClick={() => toggleSection('inventory')}
             >
               <FiPackage />
-              Decants
+              Inventario
             </button>
+            {activeSection === 'inventory' && (
+              <ul className="space-y-2 pl-8">
+                <li>
+                  <button
+                    onClick={() => handleNavigation('list')}
+                    className="hover:underline"
+                  >
+                    Lista de Perfumes
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('decants')}
+                    className="hover:underline"
+                  >
+                    Lista de Decants
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('add')}
+                    className="hover:underline"
+                  >
+                    Agregar Perfume
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('addDecant')}
+                    className="hover:underline"
+                  >
+                    Agregar Decant
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('transfers')}
+                    className="hover:underline"
+                  >
+                    Transferencias
+                  </button>
+                </li>
+              </ul>
+            )}
           </li>
+
+          {/* Ventas */}
           <li>
             <button
-              onClick={() => handleNavigation('add')}
-              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
+              className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-gray-700"
+              onClick={() => toggleSection('sales')}
             >
-              <FiPlusCircle />
-              Perfume
+              <FiShoppingCart />
+              Ventas
             </button>
-          </li>
-          <li>
-            <button
-              onClick={() => handleNavigation('addDecant')}
-              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
-            >
-              <FiUserPlus />
-              Decant
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => handleNavigation('transfers')}
-              className="flex items-center gap-2 block w-full py-2 px-4 text-left hover:text-white transition-all duration-300"
-            >
-              <FiShuffle />
-              Transferencias
-            </button>
+            {activeSection === 'sales' && (
+              <ul className="space-y-2 pl-8">
+                <li>
+                  <button
+                    onClick={() => handleNavigation('ventas')}
+                    className="hover:underline"
+                  >
+                    Lista de Ventas
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('clientes')}
+                    className="hover:underline"
+                  >
+                    Clientes
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('vendedores')}
+                    className="hover:underline"
+                  >
+                    Vendedores
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => handleNavigation('proveedores')}
+                    className="hover:underline"
+                  >
+                    Proveedores
+                  </button>
+                </li>
+              </ul>
+            )}
           </li>
         </ul>
       </div>
-    </nav>
+
+      {/* Contenido principal */}
+      <div className="flex-1 p-8 ml-64">{/* Aquí se renderizan las páginas */}</div>
+    </div>
   );
 };
 

@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const db = require('./models'); // ✅ Ruta relativa para modelos
-const perfumeRoutes = require('./routes/perfumeRoutes'); // ✅ Ruta relativa para rutas
+const db = require('./models');
+const perfumeRoutes = require('./routes/perfumeRoutes');
 const decantRoutes = require('./routes/decantRoutes');
 const transferRoutes = require('./routes/transferRoutes');
+const proveedoresRoutes = require('./routes/proveedoresRoutes'); 
+const clientesRoutes = require('./routes/clientesRoutes'); 
+const vendedoresRoutes = require('./routes/vendedoresRoutes'); 
+const ventasRoutes = require('./routes/ventasRoutes');
+
 require('dotenv').config();
 
 const app = express();
@@ -24,6 +29,10 @@ const PORT = process.env.PORT || 8080;
 app.use('/api/perfumes', perfumeRoutes);
 app.use('/api/decants', decantRoutes);
 app.use('/api/transfers', transferRoutes);
+app.use('/api/proveedores', proveedoresRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/vendedores', vendedoresRoutes);
+app.use('/api/ventas', ventasRoutes);
 
 // ✅ Prueba de conexión a la base de datos
 app.get('/ping-db', async (req, res) => {
@@ -98,3 +107,11 @@ app._router.stack.forEach((middleware) => {
     });
   }
 });
+
+db.sequelize.sync({ force: false }) // Asegúrate de no usar { force: true } en producción
+  .then(() => {
+    console.log('✅ Tablas sincronizadas correctamente.');
+  })
+  .catch((error) => {
+    console.error('❌ Error al sincronizar las tablas:', error);
+  });

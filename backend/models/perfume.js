@@ -14,15 +14,46 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'perfume_id',
         as: 'decants', // Alias para la relación
       });
+
+      // Relación: Perfume pertenece a un Proveedor
+      Perfume.belongsTo(models.Proveedor, {
+        foreignKey: 'proveedor_id',
+        as: 'proveedor', // Alias para la relación
+        onDelete: 'SET NULL', // Establece el proveedor como null si se elimina
+        onUpdate: 'CASCADE', // Actualiza automáticamente la relación
+      });
     }
   }
 
   Perfume.init(
     {
-      name: DataTypes.STRING,
-      total_ml: DataTypes.INTEGER,
-      remaining_ml: DataTypes.INTEGER,
-      status: DataTypes.STRING,
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      total_ml: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      remaining_ml: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      status: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isIn: [['nuevo', 'parcial', 'vendido']],
+        },
+      },
+      proveedor_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false, // Opcional al inicio
+        references: {
+          model: 'Proveedores',
+          key: 'id',
+        },
+      },
     },
     {
       sequelize,

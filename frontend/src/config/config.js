@@ -7,7 +7,8 @@ module.exports = {
     database: process.env.DB_NAME || 'database_development',
     host: process.env.DB_HOST || '127.0.0.1',
     port: process.env.DB_PORT || 3306,
-    dialect: 'mysql'
+    dialect: 'mysql',
+    logging: console.log
   },
   test: {
     username: process.env.DB_USER || 'root',
@@ -26,7 +27,7 @@ module.exports = {
     dialect: 'mysql',
     dialectOptions: {
       ssl: {
-        rejectUnauthorized: true
+        rejectUnauthorized: false // Permite certificados autofirmados
       }
     },
     pool: {
