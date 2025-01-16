@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../../config';
 
 const SalesList = () => {
   const [sales, setSales] = useState([]);
@@ -9,7 +10,7 @@ const SalesList = () => {
   useEffect(() => {
     const fetchSales = async () => {
       try {
-        const response = await axios.get('/api/ventas');
+        const response = await axios.get(`${API_BASE_URL}/ventas`);
         setSales(response.data);
       } catch (err) {
         setError('Error al cargar las ventas');
