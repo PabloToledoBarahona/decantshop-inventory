@@ -10,6 +10,9 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    rollupOptions: {
+      external: ['react-router-dom'], // Asegúrate de que react-router-dom se maneje correctamente
+    },
   },
   resolve: {
     alias: {
@@ -17,7 +20,7 @@ export default defineConfig({
     },
   },
   css: {
-    postcss: path.resolve(__dirname, './postcss.config.js'), // Agrega referencia explícita a postcss
+    postcss: path.resolve(__dirname, './postcss.config.js'),
   },
   base: '/',
 });
