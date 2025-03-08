@@ -108,7 +108,7 @@ app._router.stack.forEach((middleware) => {
   }
 });
 
-db.sequelize.sync({ force: false }) // Asegúrate de no usar { force: true } en producción
+db.sequelize.sync({ force: false }) // No usar { force: true } en producción
   .then(() => {
     console.log('✅ Tablas sincronizadas correctamente.');
   })
